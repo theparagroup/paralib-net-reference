@@ -26,5 +26,6 @@ to configure razor and prevent *.cshtml and other files from being served or
 executed when accessed direction. In other words, stuff in the views folder
 should only be accessible via routes and the view engine, not http://localhost/Views.
 
+Add a view.
 
-
+Add a model, pass it to the view in the controller. Mark the view as strongly-typed.
