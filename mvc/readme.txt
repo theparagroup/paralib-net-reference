@@ -18,3 +18,5 @@ Instead, the routing system will stop and let IIS handle these as normal.
 Create a controller. The containing folder name doesn't matter, but the class
 should derive from Controller and the class name must end in "Controller".
 We use attribute-based routing.
+
+Configure attribute-based routing in the application start event.
