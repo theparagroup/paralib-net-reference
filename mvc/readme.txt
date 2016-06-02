@@ -29,3 +29,8 @@ should only be accessible via routes and the view engine, not http://localhost/V
 Add a view.
 
 Add a model, pass it to the view in the controller. Mark the view as strongly-typed.
+
+Use a layout.
+
+Move the layout code to a _ViewStart file (note case of the word viewstart doesn't matter).
+
