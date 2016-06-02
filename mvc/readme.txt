@@ -13,4 +13,8 @@ Add Microsoft.AspNet.Mvc 5 via NuGet
 Create a global event handler (Global.asax)
 
 Tell the routing system to NOT pass resource requests (*.axd) to controllers
-Istead, the routing system will stop and let IIS handle these as normal.
+Instead, the routing system will stop and let IIS handle these as normal.
+
+Create a controller. The containing folder name doesn't matter, but the class
+should derive from Controller and the class name must end in "Controller".
+We use attribute-based routing.
