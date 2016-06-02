@@ -15,6 +15,7 @@ namespace mvc
       protected void Application_Start(object sender, EventArgs e)
       {
          RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+         RouteTable.Routes.MapMvcAttributeRoutes();
       }
 
       protected void Session_Start(object sender, EventArgs e)
