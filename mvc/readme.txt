@@ -8,4 +8,4 @@ Create new project:
 	Empty 4.6 Template
 	Uncheck "Host in the cloud"
 
-
+Add Microsoft.AspNet.Mvc 5 via NuGet
