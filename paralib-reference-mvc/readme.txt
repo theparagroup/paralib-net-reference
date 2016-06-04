@@ -37,5 +37,27 @@ Move the layout code to a _ViewStart file (note case of the word viewstart doesn
 
 
 =============================================================
-====	Next Section
+====	MVC Overview
+=============================================================
+
+The current version (as of writing this) of MVC is 5.2, and it is based on ASP.NET 4.6.
+
+ASP.NET lives in System.Web.dll, and MVC lives in several DLLs, including
+
+	System.Web.Mvc.dll
+	System.Web.Razor.dll
+	System.Web.WebPages.dll
+
+MVC builds and extends ASP Routing, which is implemented in the UrlRoutingModule class
+(an HttpModule) in System.Web.dll. Most (if not all) of "MVC Routing" is really just
+ASP.NET Routing.
+
+The UrlRoutingModule is usually registered via the IIS or IIS Express configuration.
+
+It the past MVC.
+
+
+
+=============================================================
+====	IIS and IIS Express
 =============================================================

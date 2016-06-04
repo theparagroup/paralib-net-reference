@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using mvc.Models;
+using com.paralib.reference.mvc.Models;
 
-namespace mvc.Controllers
+namespace com.paralib.reference.mvc.Controllers
 {
    public class HelloController : Controller
    {

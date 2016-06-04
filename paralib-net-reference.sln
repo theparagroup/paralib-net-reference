@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mvc", "mvc\mvc.csproj", "{AEBCAD54-87E8-4C52-BD2C-99D928F98452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "paralib-reference-mvc", "paralib-reference-mvc\paralib-reference-mvc.csproj", "{AEBCAD54-87E8-4C52-BD2C-99D928F98452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "paralib-dal", "..\paralib-net\paralib-net\paralib-dal\paralib-dal.csproj", "{BE7E9259-7ABD-440F-B58A-2A2D6A5F525E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "paralib-dal", "..\paralib-net\paralib-dal\paralib-dal.csproj", "{BE7E9259-7ABD-440F-B58A-2A2D6A5F525E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

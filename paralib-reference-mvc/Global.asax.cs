@@ -7,7 +7,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
 
-namespace mvc
+namespace com.paralib.reference.mvc
 {
    public class Global : System.Web.HttpApplication
    {
