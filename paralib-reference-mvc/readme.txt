@@ -1,4 +1,237 @@
 ﻿=============================================================
+====	IIS and IIS Express
+=============================================================
+
+Visual Studio 2015 can be configured to use either the developer version of IIS,
+IIS Express, or a local instance of IIS.
+
+When configuring IIS Express, use the following file:
+
+		{solution}\.vs\config\applicationhost.config
+
+For example, if trying to use Windows Authentication with IIS Express, you'll
+need to modify the following entry in applicationhost.config:
+
+		<windowsAuthentication enabled="false">
+			<providers>
+				<add value="Negotiate" />
+				<add value="NTLM" />
+			</providers>
+		</windowsAuthentication>
+
+
+To use IIS with Visual Studio, ensure you have access to the following folder:
+
+		C:\Windows\System32\inetsrv\config
+
+And check:
+
+		ISAPI & CGI Restrictions
+		Folder permissions
+		Application Pool
+		Port
+		Verify Web Site is running
+
+
+=============================================================
+====	IIS Authentication
+=============================================================
+
+ASP.NET is implemented as an IIS ISAPI Extension (aspnet_isapi.dll). The IIS 
+process and extensions of course must run under some security context 
+(user account), IIS allow each request to run with an associated access token.
+By default, all resource requests (HTML files, etc) will be compared to this
+token to determine if the user making the request can access the resource.
+
+IIS creates this access token based on the IIS authentication options, which include:
+
+		Basic Authentication per RFC 2617
+		Integrated Windows Authentication (enabled by default)
+		Annonymous Authentication (also enabled by default)
+
+With Basic or Windows, IIS will challenge the web browser for credentials. With anonymous,
+an predefined, existing account will be used for the request. Any of these accounts may
+or may not have access to the actual resource (file).
+
+How this works has changed over the years:
+
+In II5 (and IIS 5 Isolation Mode in II6), IIS (inetinfo.exe) ran in user mode under SYSTEM,
+and ASP.NET ran in a single worker process (aspnet_wp.exe) under the ASPNET account. The 
+access token for anonymous access was IUSR_MachineName (using the NETBIOS name), but could
+be changed.
+
+In IIS6, IIS was moved to kernel mode (HTTP.sys) and ASP.NET work processes (w3wp.exe) run
+in "application pools". The access token for anonymous access was still IUSR_MachineName.
+
+In IIS7, the anonymous account was changed to the built-in IUSR, and optionally can be a
+new concept called ApplicationPoolIdentity. Also, ASP.NET has been fully integrated into
+IIS, and the ISAPI extension is no longer used (unless you are in "Classic mode").
+
+Note: IIS7 Integrated Mode does not support ASP Impersonation (see below).
+
+VERSION		IIS Process/Account		ASP.NET Worker Process/Account	IIS Anonymous Account
+-------		--------------------	------------------------------	-----------------------
+5			inetinfo.exe/SYSTEM		aspnet_wp.exe/ASPNET			IUSR_MachineName
+6			(kernel)				w3wp.exe/NETWORKSERVICE			IUSR_MachineName
+7			(kernel)				w3wp.exe/ApplicationPoolId		IUSR
+
+
+You can access the account that is actually executing this way:
+
+		System.Security.Principal.WindowsIdentity.GetCurrent().Name
+
+This will either be the Worker Process Account or something else if impersonation is enabled.
+
+You can see the account in the "access token" that IIS sends to ASP.NET this way:
+
+		Request.LogonUserIdentity.Name
+
+This will either be the authenticated user (basic or windows) or the anonymous user (IUSR).
+
+
+
+=============================================================
+====	Framework 4.5 Runtime Opt-In
+=============================================================
+
+Some of the information below (mostly regarding security) involves breaking changes
+to the Framework runtime between version 4.0 and 4.5. Both use CLR 4.0, so the
+breaking changes are in "Framework code" only.
+
+When an ASP.NET application includes the following in the web.config:
+
+		<httpRuntime targetFramework="4.5" />
+
+or a non-web application includes this in its app.config:
+
+		<supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.5"/>
+
+Then you use the new runtime. Otherwise you will run in "quirks mode" and be compatible
+with the 4.0 Framework.
+
+Note when you turn on 4.5 in an ASP.NET application the following is infered (but
+overrideable) in your web.config:
+
+		<configuration>
+		  <appSettings>
+			<add key="aspnet:UseTaskFriendlySynchronizationContext" value="true" />
+			<add key="ValidationSettings:UnobtrusiveValidationMode" value="WebForms" />
+		  </appSettings>
+			<system.web>
+			  <compilation targetFramework="4.5" />
+			  <machineKey compatibilityMode="Framework45" />
+			  <pages controlRenderingCompatibilityVersion="4.5" />
+			</system.web>
+		</configuration>
+
+It's a mess.
+
+
+=============================================================
+====	ASP.NET Security
+=============================================================
+
+ASP.NET provides cryptographic services to applications, for example encrypting "ViewState"
+or "Authentication Tickets".
+
+Cryptographic settings can be changed with the <machineKey> element in web.config:
+
+		<system.web>
+			<machineKey decryption="DES" ... />
+
+Controlling ViewState:
+
+		<system.web>
+			<pages viewStateEncryptionMode="Always" ... />
+
+Controlling Authentication Tickets:
+
+		<system.web>
+			<forms protection="All" ... />
+
+IIS5 ran under the SYSTEM account, and machine keys were stored in as LSA Secrets:
+
+		HKEY_LOCAL_MACHINE\SECURITY\Policy\Secrets
+
+In IIS6, this was changed to NETWORKSERVICE and the HKCU hive:
+
+		HKEY_CURRENT_USER\Software\Microsoft\ASP.NET\4.0.30319.0
+
+Before .NET 4.0, developers didn't have direct access to these functions. The
+following classes are marked internal:
+
+		System.Web.Configuration.MachineKeySection.Encode()
+		System.Web.Configuration.MachineKeySection.Decode()
+
+However, in 4.0 the MachineKey class was added, providing access to these methods:
+
+		System.Web.Security.MachineKey.Encode()
+		System.Web.Security.MachineKey.Decode()
+
+In 4.5 (see the opt-in section above) support for the newer CryptoAPI was added to
+ASP.NET:
+
+		System.Web.Security.Cryptography.AspNetCryptoServiceProvider.Protect()
+		System.Web.Security.Cryptography.AspNetCryptoServiceProvider.UnProtect()
+
+Again, these are internal, but you can access the functionality via MachineKey:
+
+		System.Web.Security.MachineKey.Protect()
+		System.Web.Security.MachineKey.UnProtect()
+
+
+=============================================================
+====	ASP.NET Authentication
+=============================================================
+
+ASP.NET provides an additional authentication layer. At this layer, we can set the current
+authenticated user for the current request (and thread) using the following properties:
+
+		System.Threading.Thread.CurrentPrincipal
+		System.Web.HttpContext.User
+
+Both of which are of type IPrincipal.
+
+We use the following web.config entry:
+
+		<system.web>
+			<authentication mode= "[Windows|Forms|Passport|None]"/>
+
+ASP.NET "Windows" Authentication will take the access token from IIS (only if IIS Authentication
+Windows or Basic is enabled) and set these properties to the user in the token.
+
+"Forms" enables the "Forms Authentication" mechanism where the application can define its own
+custom users and roles (stored in a database, for example).
+
+"None" does nothing, and again allows the application to set the IPrincipal in a custom manner.
+
+=============================================================
+====	Forms Authentication
+=============================================================
+
+genericprincipal
+formsidentity
+
+=============================================================
+====	ASP.NET Impersonation & Delegation
+=============================================================
+
+Normally ASP.NET applications execute using the security context of the worker process. This is
+not to be confused with the authenticated user (the access token).
+
+If desired, the application can be configured to run in the security context of the requesting
+user, or a completely different user:
+
+	<system.web>
+		<identity impersonate="true" userName="domain\user" password="password" />
+
+Note: impersonation is not supported in II7 Integrated mode, but it is supported in Classic mode.
+
+Note: a related but distinct concept is delegation. This is where IIS bounces the
+user credentials against another server. NTLM doesn't support it, but Kerberos
+and Basic do support it. You can always call LogonUser with "Interactive."
+
+=============================================================
 ====	ASP.NET Routing vs MVC
 =============================================================
 
@@ -38,6 +271,18 @@ Web Pages are very similiar to classic ASP in that it is a very simple and light
 templating engine. The main differences are that Web Pages are compiled and can use the
 full .NET CLR.
 
+Note on Razor: It is important to understand that while Razor is designed to be an HTML
+templating engine (it understands HTML <tag> syntax), and it is located in the "System.Web"
+namespace (System.Web.Razor.dll), Razor actually has no dependencies on ASP.NET. Razor can
+be used completely independently of MVC or ASP.NET.
+
+Certain constructs (@Html, Layouts & @RenderSection, etc.) are actually part of MVC and 
+technically not Razor or Web Pages.
+
+=============================================================
+====	Zero Configuration (PreApplicationStartMethodAttribute)
+=============================================================
+
 Since Web Pages are implemented as HttpModules and HttpHandlers, you may expect to see
 registration entries in your Web.config files like this:
 
@@ -59,13 +304,7 @@ The Razor BuildProviders for VB (*.vbhtml) and C# (*.cshtml) are installed by de
 MVC applications. This is also accomplished via the PreApplicationStartMethod attribute
 (in System.Web.WebPages.Razor.dll), so when that assembly is loaded, so is Razor.
 
-Note on Razor: It is important to understand that while Razor is designed to be an HTML
-templating engine (it understands HTML <tag> syntax), and it is located in the "System.Web"
-namespace (System.Web.Razor.dll), Razor actually has no dependencies on ASP.NET. Razor can
-be used completely independently of MVC or ASP.NET.
 
-Certain constructs (@Html, Layouts & @RenderSection, etc.) are actually part of MVC and 
-technically not Razor or Web Pages.
 
 =============================================================
 ====	MVC Overview
@@ -171,26 +410,9 @@ MVC5, 2013, .Net 4.0/4.5, Visual Studio 2013
     Scaffolding
     Authentication Filters
 
-=============================================================
-====	IIS and IIS Express
-=============================================================
 
-Visual Studio 2015 can be configured to use either the developer version of IIS,
-IIS Express, or a local instance of IIS.
 
-When configuring IIS Express, use the following file:
 
-		{solution}\.vs\config\applicationhost.config
-
-For example, if trying to use Windows Authentication with IIS Express, you'll
-need to modify the following entry in applicationhost.config:
-
-		<windowsAuthentication enabled="false">
-			<providers>
-				<add value="Negotiate" />
-				<add value="NTLM" />
-			</providers>
-		</windowsAuthentication>
 
 =============================================================
 ====	Creating an MVC5 Project (the hard way)
@@ -263,6 +485,46 @@ Move the layout code to a _ViewStart file (note case of the word viewstart doesn
 
 Done.
 
+
+
+
 =============================================================
-====	Next
+====	Forms Authentication & MVC
 =============================================================
+
+
+use anonymous
+
+app domain user
+aspnet
+net serv
+
+client impersonation
+app impersonation
+
+request user
+
+iis vs asp authentication
+asp impersonation
+ asp identity
+
+ thread user vs httpcontext user
+
+
+=============================================================
+====	Ajax
+=============================================================
+
+if (401) reload()
+
+302
+
+HttpResponse.SuppressFormsAuthenticationRedirect
+Request.IsAjaxRequest
+
+X-Requested-With: XMLHttpRequest
+
+
+
+
+
