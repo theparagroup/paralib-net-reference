@@ -3,6 +3,7 @@ using com.paralib.common;
 using log4net;
 using System.Web.Mvc;
 using System.Web.Routing;
+using com.paralib.common.Logging;
 
 namespace com.paralib.reference.mvc
 {
@@ -15,7 +16,7 @@ namespace com.paralib.reference.mvc
             RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             RouteTable.Routes.MapMvcAttributeRoutes();
 
-            Configuration.Configure("mvc");
+            Configuration.Configure("mvc",LoggingModes.Mvc);
 
             _logger.Info(null);
         }
