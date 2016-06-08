@@ -4,9 +4,28 @@
         @Model.Message
     </div>
 
+<hr />
 
 @foreach (var m in HttpContext.Current.ApplicationInstance.Modules.AllKeys)
 {
     @(m + " - " + HttpContext.Current.ApplicationInstance.Modules[m].GetType().FullName )
     <br/>
+}
+
+<hr />
+
+System.Security.Principal.WindowsIdentity.GetCurrent().Name = @System.Security.Principal.WindowsIdentity.GetCurrent().Name <br />
+Request.LogonUserIdentity.Name = @Request.LogonUserIdentity.Name [ @Request.LogonUserIdentity.AuthenticationType ] <br />
+Request.IsAuthenticated = @Request.IsAuthenticated <br />
+System.Threading.Thread.CurrentPrincipal.Identity.Name = @System.Threading.Thread.CurrentPrincipal.Identity.Name [@System.Threading.Thread.CurrentPrincipal.GetType().Name] <br />
+Context.User.Identity.Name = @Context.User.Identity.Name [@Context.User.GetType().Name] <br />
+
+<hr />
+
+@{ 
+
+    /*
+    string x = null;
+    x.ToString();
+    */
 }
