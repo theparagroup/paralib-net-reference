@@ -1,4 +1,89 @@
 ﻿=============================================================
+====	.NET Framework, ASP.NET & MVC History
+=============================================================
+
+Note: Framework and ASP.NET version numbers are the same.
+
+[year] [Framework/CLR] [Visual Studio (internal/file version]
+
+2002, .Net 1.0/1.0, Visual Studio.NET (7.0/7.0)
+
+		Web Forms (*.aspx)
+		Web Services (*.asmx)
+
+2003, .Net 1.1/1.1, Visual Studio.NET 2003 (7.1/8.0)
+
+2005, .Net 2.0/2.0, Visual Studio 2005 (8.0/9.0)
+
+		Master pages
+		Web parts
+		64-bit support
+		Roles & Membership
+
+2006, .Net 3.0/2.0, (no new Visual Studio release) 
+
+		WPF
+		WF
+		WCF
+
+2007, .Net 3.5/2.0, Visual Studio 2008 (9.0/10.0)
+
+		AJAX
+		LINQ
+		EF1 (v1)
+
+		MVC1 (2009):
+			WebForms
+			Html Helpers
+			Ajax Helpers
+
+		MVC2 (2009):
+			Strongly-typed helpers
+			client-side validation
+			Areas
+			support for data annotations
+			HttpGet, HttpPost, etc attributes
+
+2010, .Net 4.0/4.0, Visual Studio 2010 (10.0/11.0)
+
+		EF4 (v2)
+		WebPages
+		Razor
+		WebMatrix (2011)
+		SimpleMembership (2011)
+		MVC3 (2011):
+			ViewBag (ViewData that uses new dynamic ExpandoObject)
+			Global Action Filters
+			Unobtrusive JavaScript
+			NuGet
+
+2012, .Net 4.5/4.0, Visual Studio 2012 (11.0/12.0)
+
+		EF5 (v3)
+		WebPages2 (open sourced)
+		WebAPI (open sourced)
+		MVC4 (open sourced):
+			Bundling & Minification
+
+2013, .Net 4.5.1/4.0, Visual Studio 2013 (12.0/12.0)
+
+		EF6 (open sourced)
+		WebAPI2
+		Identity 1.0
+		Identity 2.0 (2014)
+		MVC5:
+			Scaffolding
+			Authentication Filters
+
+2015, .Net 4.6/4.0, Visual Studio 2015 (14.0/12.0)
+
+2016?, 5.0/.NET Core, Visual Studio "15" (15.0/?)
+
+		EF7
+		MVC6
+		Razor 4
+
+=============================================================
 ====	IIS and IIS Express
 =============================================================
 
@@ -62,6 +147,7 @@ be changed.
 
 In IIS6, IIS was moved to kernel mode (HTTP.sys) and ASP.NET work processes (w3wp.exe) run
 in "application pools". The access token for anonymous access was still IUSR_MachineName.
+IIS6 was the first version of IIS after the .NET Framework was released.
 
 In IIS7, the anonymous account was changed to the built-in IUSR, and optionally can be a
 new concept called ApplicationPoolIdentity. Also, ASP.NET has been fully integrated into
@@ -71,10 +157,11 @@ Note: IIS7 Integrated Mode does not support ASP Impersonation (see below).
 
 VERSION		IIS Process/Account		ASP.NET Worker Process/Account	IIS Anonymous Account
 -------		--------------------	------------------------------	-----------------------
-5			inetinfo.exe/SYSTEM		aspnet_wp.exe/ASPNET			IUSR_MachineName
-6			(kernel)				w3wp.exe/NETWORKSERVICE			IUSR_MachineName
-7			(kernel)				w3wp.exe/ApplicationPoolId		IUSR
-
+5/2000		inetinfo.exe/SYSTEM		aspnet_wp.exe/ASPNET			IUSR_MachineName
+6/2003		(kernel)				w3wp.exe/NETWORKSERVICE			IUSR_MachineName
+7/2008		(kernel)				w3wp.exe/ApplicationPoolId		IUSR
+8/2012
+10/2016
 
 You can access the account that is actually executing this way:
 
@@ -84,10 +171,13 @@ This will either be the Worker Process Account or something else if impersonatio
 
 You can see the account in the "access token" that IIS sends to ASP.NET this way:
 
-		Request.LogonUserIdentity.Name
+		Request.LogonUserIdentity
 
-This will either be the authenticated user (basic or windows) or the anonymous user (IUSR).
+This will either be the authenticated user (basic or windows) or the anonymous user (IUSR),
+and is always a WindowsIdentity principal (NOT an IPrincipal - see ASP.NET Authentication).
 
+Note: Microsoft plans to further decouple ASP.NET from IIS via the "Open Web Interface for 
+.NET" (OWIN) standard and project Katana.
 
 
 =============================================================
@@ -181,43 +271,11 @@ Again, these are internal, but you can access the functionality via MachineKey:
 
 
 =============================================================
-====	ASP.NET Authentication
-=============================================================
-
-ASP.NET provides an additional authentication layer. At this layer, we can set the current
-authenticated user for the current request (and thread) using the following properties:
-
-		System.Threading.Thread.CurrentPrincipal
-		System.Web.HttpContext.User
-
-Both of which are of type IPrincipal.
-
-We use the following web.config entry:
-
-		<system.web>
-			<authentication mode= "[Windows|Forms|Passport|None]"/>
-
-ASP.NET "Windows" Authentication will take the access token from IIS (only if IIS Authentication
-Windows or Basic is enabled) and set these properties to the user in the token.
-
-"Forms" enables the "Forms Authentication" mechanism where the application can define its own
-custom users and roles (stored in a database, for example).
-
-"None" does nothing, and again allows the application to set the IPrincipal in a custom manner.
-
-=============================================================
-====	Forms Authentication
-=============================================================
-
-genericprincipal
-formsidentity
-
-=============================================================
 ====	ASP.NET Impersonation & Delegation
 =============================================================
 
 Normally ASP.NET applications execute using the security context of the worker process. This is
-not to be confused with the authenticated user (the access token).
+not to be confused with the IIS-authenticated user (the access token).
 
 If desired, the application can be configured to run in the security context of the requesting
 user, or a completely different user:
@@ -230,6 +288,214 @@ Note: impersonation is not supported in II7 Integrated mode, but it is supported
 Note: a related but distinct concept is delegation. This is where IIS bounces the
 user credentials against another server. NTLM doesn't support it, but Kerberos
 and Basic do support it. You can always call LogonUser with "Interactive."
+
+
+=============================================================
+====	.NET (and ASP.NET) Authentication
+=============================================================
+
+ASP.NET provides an additional authentication layer that build upon .NET security features
+found in the System.Security namespace. At this layer, we can set the current authenticated 
+user for the current request (and thread) using the following properties:
+
+		System.Threading.Thread.CurrentPrincipal
+		System.Web.HttpContext.User
+
+Both of which are of type IPrincipal (NOT WindowsPrincipal, as sent over by IIS). Typically
+these are GenericPrincipal objects, and the DefaultAuthenticationModule will create one
+whether there is an authenticated user or not.
+
+Unfortunately, these are redundant, and both should point to the same principal and should
+be kept in sync. When setting them in custom authentication schemes, both should be set
+at the same time. The threading version is what you use in non-ASP applications, and the
+HttpContext version is supposed to be "convienent".
+
+There's a lot of strange redundencies in ASP.NET, for example, these always return the 
+same value:
+
+		Context.Request.IsAuthenticated 
+		Context.User.Identity.IsAuthenticated
+
+The IPrincipal interface is very simple, and basically combines an "identity" with a
+generic concepts of authentication and authorization ("roles").
+
+		IPrincipal:
+			IIdentity Identity {get;}
+			bool IsInRole(string);
+
+		IIdentity
+			string AuthenticationType {get;} //NTLM, Basic, etc.
+			bool IsAuthenticated {get;}
+			string Name {get;}
+
+You can use the PrincipalPermission attribute to mark classes and methods as requiring
+authenticated users with specific roles before allowing execution. Understand this is 
+a .NET feature, not a ASP.NET-specific feature.
+
+Note: be aware that with the new Identity mechanism added in ASP.NET 4.5, the inheritance
+hierarchy for many classes (GenericPrincipal, FormsIdentity, etc.) has been changed to 
+include new classes that provice the "claims based" Identity features:
+
+		Claim
+		ClaimsPrincipal
+		ClaimsIdentity
+		ClaimsPrincipalPermission
+
+If not using claims, you can ignore these and use the old interfaces and classes. As of
+.NET 4.5, instead of implementing IPrincipal and IIdentity (as in custom Forms Authentication), 
+one should derive from these classes. Instead of custom properties (email, location), use claims.
+
+We use the following web.config entry to configure ASP.NET authentication:
+
+		<system.web>
+			<authentication mode= "[Windows|Forms|Passport|None]"/>
+
+ASP.NET "Windows" Authentication will take the access token from IIS (only if IIS Authentication
+Windows or Basic is enabled) and set various properties of the GenericPrincipal to values in the 
+token. This is implemented in the WindowsAuthenticationModule (an HttpModule). It is important to 
+understand that IIS actually does the authentication and this module simply populates the principal. 
+
+See also: LOGON_USER and AUTH_TYPE.
+
+"Forms" enables the "Forms Authentication" mechanism where the application can define its own
+custom users and roles (stored in a database, for example). We'll discuss this next.
+
+"None" does nothing, and again allows the application to set the IPrincipal in a custom manner.
+
+=============================================================
+====	ASP.NET Architecture
+=============================================================
+
+Once IIS has mapped an extension to ASP.NET, the request is sent through the ASP.NET Pipeline.
+If this is the first request for the application, the Application Domain is created and many
+other things which we'll skip over here.
+
+A new HttpApplication object is created (or reused from a pool). If your application has a 
+Global.asax defined, then that will be instantiated. Otherwise the base class will be.
+
+If this is the first request through the pipeline, then the following method will be called:
+
+		Application_Start(...)
+
+For all requests:
+
+		Application_BeginRequest(...)
+		Application_Error(...)
+		Application_EndRequest(...)
+
+If (when) the application is unloaded:
+
+		Application_End(...)
+
+There are additional methods and events that can be hooked into in Global.asax:
+
+		Session Events
+		Request Events
+		Module Events
+
+Note: some events are proper .NET events (such as )
+
+The HttpContext object is created and wired-up as follows:
+
+		HttpContext
+			HttpApplication ApplicationInstance {get;}
+			HttpApplicationStateBase Application {get;}
+			HttpRequestBase Request {get;}
+			HttpResponseBase Response {get;}
+			HttpServerUtilityBase Server {get;}
+			HttpSessionStateBase Session {get;}
+
+
+
+SessionState_OnStart?
+
+
+=============================================================
+====	Forms Authentication
+=============================================================
+
+genericprincipal
+formsidentity
+formsauthenticationticket
+formsauthenticationmodule
+defaultauthenticaionmodule
+skipauth
+
+=============================================================
+====	URL Authorization
+=============================================================
+
+urlauthorizationmodule
+
+
+=============================================================
+====	Membership & Identity Frameworks
+=============================================================
+
+Here we discuss the following frameworks:
+
+		ASP.NET 2.0 Membership
+		SimpleMembership
+		ASP.NET Identity
+
+In ASP.NET 2.0 Membership was introduced. This used the new Provider Model,
+which is a dependency injection framework implementing the following patterns:
+
+		Strategy
+		Factory Method
+		Singleton
+		Fascade
+
+Other things besides membership used the provider model, such as session storage.
+
+Two built-in membership providers were:
+
+		SQL Server
+		Active Directory
+
+Using membership, your application could get authentication, role-based
+authorization, and management features "for free". Visual Studio made it "easy"
+to build login, change password, and "create user" forms using membership-aware 
+Web Form controls (*.ascx).
+
+Membership was fundementally broken. The built-in providers were limited in such
+things like table names and hashing algorithms, and the interfaces were heavy and 
+painful to implement if you wanted to create your own provider. Also, Membership
+was tied to Forms Authentication. The biggest issue that "roles" are not always
+the best authorization model.
+
+When the WebMatrix was released in 2001 (around the MVC3/MVC4 releases), a new
+membership system (SimpleMembership) was released along with a new WebSecurity
+API. While these originally came with WebMatrix, they could be used in MVC.
+Unfortunately, SimpleMembership basically wrapped the ASP.NET 2.0 Membership
+classes with "simpler" ones:
+
+		SimpleMembershipProvider
+		SimpleRoleProvider
+
+A few improvements were made but SimpleMembership essentially has all the same
+issues as ASP.NET Membership.
+
+In 2013 ASP.NET Identity was released. It is a complete redesign and rewrite of the
+membership system. In 2014 Identity 2.0 was released.
+
+Some ASP.NET Identity 1.0 Features:
+
+		OWIN Support
+		External Logins (Facebook, Google, etc.)
+		Async Support
+		EF6-based provider
+
+Some ASP.NET Identity 2.0 Features:
+
+		Two-Factor Authentication
+		Account Confirmation via email
+		Account Lock-Out
+
+In short, Identity is better than "classic" Membership, but it's new and in a 
+state of change, and still pretty heavy. 
+
+
 
 =============================================================
 ====	ASP.NET Routing vs MVC
@@ -377,41 +643,6 @@ of which of the two built-in view technologies you are using, all of MVC idioms
 are supported.
 
 
-=============================================================
-====	MVC History
-=============================================================
-
-MVC1, 2009, .Net 3.5, Visual Studio 2008
-	WebForms
-	Html Helpers
-	Ajax Helpers
-
-MVC2, 2010, .Net 3.5/4.0, Visual Studio 2008/2010
-	Strongly-typed helpers
-	client-side validation
-	Areas
-	support for data annotations
-	HttpGet, HttpPost, etc attributes
-
-MVC3, 2011, .Net 4.0, Visual Studio 2010
-	Razor (ASP.NET)
-	ViewBag (ViewData that uses new dynamic ExpandoObject)
-	Global Action Filters
-	Unobtrusive JavaScript
-	NuGet
-
-MVC4, 2012, .Net 4.0/4.5, Visual Studio 2010/2012
-	WebAPI (ASP.NET)
-	Bundling & Minification
-
-MVC5, 2013, .Net 4.0/4.5, Visual Studio 2013
-    WebAPI2 (ASP.NET)
-    Identity (ASP.NET)
-    Scaffolding
-    Authentication Filters
-
-
-
 
 
 =============================================================
@@ -510,9 +741,11 @@ asp impersonation
 
  thread user vs httpcontext user
 
+Crypto.HashPassword(password)
+Crypto.VerifyHashedPassword
 
 =============================================================
-====	Ajax
+====	Forms Authentication & Ajax
 =============================================================
 
 if (401) reload()
@@ -525,6 +758,12 @@ Request.IsAjaxRequest
 X-Requested-With: XMLHttpRequest
 
 
+=============================================================
+====	XSS & MVC
+=============================================================
 
 
+[AllowHtml] or [ValidateInput(false)]
+Html.Raw is used. Html.AntiForgeryToken()
+AntiXSS NuGet (if you need to accept HTML from users)
 

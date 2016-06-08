@@ -121,7 +121,20 @@
     <Compile Include="Models\Hello.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\paralib-net\paralib-common\paralib-common.csproj">
+      <Project>{101e2741-5a3d-460b-bdf4-f5e5bd27cf1c}</Project>
+      <Name>paralib-common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\paralib-net\paralib-dal\paralib-dal.csproj">
+      <Project>{be7e9259-7abd-440f-b58a-2a2d6a5f525e}</Project>
+      <Name>paralib-dal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\paralib-net\paralib-mvc\paralib-mvc.csproj">
+      <Project>{9067ff6e-8819-4cb3-9e50-197c11a0633f}</Project>
+      <Name>paralib-mvc</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
