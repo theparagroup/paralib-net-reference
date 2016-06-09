@@ -104,6 +104,16 @@ need to modify the following entry in applicationhost.config:
 			</providers>
 		</windowsAuthentication>
 
+Also, be aware that Visual Studio wants to manage some of these IIS Express
+properties for you. To see these properties, select the project in the solution
+explorer and hit F4:
+
+		Anonymous Authentication
+		Windows Authentication
+		SSL Enabled
+		PipeLine Mode (Integrated, Classic)
+		etc.
+		
 
 To use IIS with Visual Studio, ensure you have access to the following folder:
 
@@ -405,7 +415,7 @@ The HttpContext object is created and wired-up as follows:
 			HttpServerUtilityBase Server {get;}
 			HttpSessionStateBase Session {get;}
 
-
+pseudo envents
 
 SessionState_OnStart?
 
@@ -525,13 +535,24 @@ curve, as well as several limitations such as being limited to a single (server-
 In ASP.NET 2.0, support for "BuildProviders" that allow for custom compilation of files
 in the ASP.NET framework (*.wsdl and *.xsd files are a good example).
 
-ASP.NET Web Pages (System.Web.WebPages.dll) are a new technology that simplifies the 
-Web Form model, and allows for different templating languages to be used in ASP.NET. 
-Web Pages debuted with MVC3 and the WebMatrix IDE, but is a distinct technology. 
+ASP.NET Web Pages (System.Web.WebPages.dll) are a new technology that leverages the
+build provider mechanism to simplify the Web Form model, and allows for different 
+templating languages (such as Razor) to be used in ASP.NET. Web Pages debuted with MVC3 
+and the WebMatrix IDE, but is a distinct technology and now used in MVC. 
 
-Web Pages handles web requests via the WebPageHttpModule and WebPageHttpHandler classes,
-and leverages the custom ASP.NET BuildProvider mechanism to allow different languages to 
-be installed, such as Razor.
+Web Pages handles Web Page requests via the WebPageHttpModule and WebPageHttpHandler 
+classes, and registers BuildProviders so that Razor view can be compiled at runtime, 
+upon the first request.
+
+In MVC, you can force views to be compiled at build by adding this to the *.csproj:
+
+		<MvcBuildViews>true</MvcBuildViews>
+
+But that doesn't actually pre-compile the views and they will still be compiled at
+runtime. To do that, see the following NuGet packages:
+
+		RazorGenerator.Mvc
+		RazorGenerator.MsBuild
 
 Web Pages are very similiar to classic ASP in that it is a very simple and lightweight 
 templating engine. The main differences are that Web Pages are compiled and can use the
@@ -542,15 +563,18 @@ templating engine (it understands HTML <tag> syntax), and it is located in the "
 namespace (System.Web.Razor.dll), Razor actually has no dependencies on ASP.NET. Razor can
 be used completely independently of MVC or ASP.NET.
 
-Certain constructs (@Html, Layouts & @RenderSection, etc.) are actually part of MVC and 
-technically not Razor or Web Pages.
+Certain constructs (@Html, Layouts & @RenderSection, etc.) are actually part of MVC base
+view classes and technically not Razor or Web Pages.
+
+
+
 
 =============================================================
 ====	Zero Configuration (PreApplicationStartMethodAttribute)
 =============================================================
 
-Since Web Pages are implemented as HttpModules and HttpHandlers, you may expect to see
-registration entries in your Web.config files like this:
+Since Web Pages are implemented as HttpModules you may expect to see registration 
+entries in your Web.config files like this:
 
 		<configuration>
 		  <system.web>
@@ -559,18 +583,37 @@ registration entries in your Web.config files like this:
 			 </httpModules>
 		  </system.web>
 		</configuration>
+
+Or because Razor uses BuildProviders, something like this:
+
+		<compilation debug=”false”>
+		 <buildProviders>
+		  <remove extension=”.xsd”/>
+		  <add appliesTo=”Code” extension=”.xsd” type=”Msdn.Samples.Compilation.XsdClassBuildProvider”/>
+		 </buildProviders>
+		</compilation>
  
 However, in ASP.NET 4 the PreApplicationStartMethodAttribute (System.Web.dll) was added, 
 allowing for zero-config ASP.NET applications. This attribute is used at the assembly 
-level and allows startup code to run before Application_Start. Used with the 
-DynamicModuleUtility class (Microsoft.Web.Infrastructure.dll), assemblies such as
-System.Web.WebPages.dll can configure themselves as soon as they are loaded.
+level and allows startup code to run before Application_Start. 
+
+Used with the DynamicModuleUtility class (Microsoft.Web.Infrastructure.dll), assemblies 
+such as System.Web.WebPages.dll can register thier HttpModule as soon as they are loaded.
 
 The Razor BuildProviders for VB (*.vbhtml) and C# (*.cshtml) are installed by default for
 MVC applications. This is also accomplished via the PreApplicationStartMethod attribute
 (in System.Web.WebPages.Razor.dll), so when that assembly is loaded, so is Razor.
 
+The Razor build providers are registered using the System.Web.Compilation.BuildProvider 
+class like this:
 
+		BuildProvider.RegisterBuildProvider(".cshtml", typeof(RazorBuildProvider));
+		BuildProvider.RegisterBuildProvider(".vbhtml", typeof(RazorBuildProvider));
+
+You can also dynamically add a referenced assembly (as you would in the <assemblies> 
+section of web.config) with:
+
+		System.Web.Compilation.BuildManager.AddReferencedAssembly()
 
 =============================================================
 ====	MVC Overview
@@ -611,7 +654,11 @@ The WebFormViewEngine expects views to derive from ViewPage, which in turn deriv
 regular ASP.NET Page class. The RazorViewEngine expects its views to be WebViewPages, which
 derive from WebPageBase (a class in System.Web.WebPages.dll).
 
-In this manner MVC jumps the gap between MVC-world and either ASPX-world or Razor-world.
+If the view needs to be compiled, the registered BuildProvider will do that on the first
+request.
+
+In this manner MVC jumps the gap between the MVC-world and the WebForm-world (or
+WebPage-world).
 
 These are the relevant class hierarchies:
 
@@ -637,10 +684,10 @@ These are the relevant class hierarchies:
 
 
 Both Web Form and Razor views have access to MVC-centric properties and methods such
-as @Html and @ViewBag, but these are not part of any interface or abstract base class
-(rather they are simply implemented in ViewPage and WebViewPage). However, regardless 
-of which of the two built-in view technologies you are using, all of MVC idioms 
-are supported.
+as @Html and @ViewBag, but these are not part Web Forms or Web Pages or Razor. These
+members are simply implemented in the base classes for view (ViewPage or WebViewPage).
+Therefore, regardless of which of the two built-in view technologies you are using, 
+all of MVC idioms are supported and avaliable.
 
 
 
@@ -660,7 +707,7 @@ Create new project:
 		Empty 4.6 Template
 		Uncheck "Host in the cloud"
 
-Add Microsoft.AspNet.Mvc 5 via NuGet
+Add Microsoft.AspNet.Mvc 5 via NuGet (or do it manually - see below)
 
 Create a global event handler (Global.asax)
 
@@ -716,6 +763,104 @@ Move the layout code to a _ViewStart file (note case of the word viewstart doesn
 
 Done.
 
+
+=============================================================
+====	Manual Installation of MVC 5 (with Razor & Roslyn)
+=============================================================
+
+The MVC NuGet packages aren't magic, and it helps to understand how to create an MVC project
+without using NuGet at all.
+
+Install the "MVC 5.2.3" assembly:
+
+		..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll
+
+If you refrence older assemblies that bind against an older version of MVC, add this to 
+web.config for backwards compatibility:
+
+		<runtime>
+			<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+				<dependentAssembly>
+					<assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35"/>
+					<bindingRedirect oldVersion="1.0.0.0-5.2.3.0" newVersion="5.2.3.0"/>
+				</dependentAssembly>
+			</assemblyBinding>
+		</runtime>
+
+
+Install Razor 3.2.3 and related assemblies:
+
+		..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll
+		..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll
+		..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll
+		..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll
+		..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll
+		..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll
+
+Note: Not all of these are required at compile time - and at runtime they run from the GAC.
+
+Again, for backwards compatibility of older assemblies:
+
+		<runtime>
+			<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			  <dependentAssembly>
+				<assemblyIdentity name="System.Web.Helpers" publicKeyToken="31bf3856ad364e35"/>
+				<bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0"/>
+			  </dependentAssembly>
+			  <dependentAssembly>
+				<assemblyIdentity name="System.Web.WebPages" publicKeyToken="31bf3856ad364e35"/>
+				<bindingRedirect oldVersion="1.0.0.0-3.0.0.0" newVersion="3.0.0.0"/>
+			  </dependentAssembly>
+			</assemblyBinding>
+		</runtime>
+
+
+Install Roslyn 1.0.1:
+
+If you want to use C# 6.0 features in your Razor views (and you do), then you'll have to install
+the new Roslyn compiler service. Visual Studio 2015 and the 4.6 framework compiler uses the new
+C# 6.0 features automatically, but these aren't used for Razor views. Instead, ASP.NET will use
+the older CodeDomProvider (System.dll) to compile your views, and this doesn't support C# 6.0.
+
+So if you want to use, say "string interpolation" (in a Razor view), you'll need to install
+Roslyn:
+
+		@($"this is foo: {foo}")
+
+Unfortunately, this is pretty complicated to do manually, so you'll still want to use NuGet for
+this. But we'll explain what the NuGet package actually does:
+
+Install the NuGet package  "CodeDOM Providers for .NET Compiler" v1.0.1, which will add the
+following reference to your project:
+
+		..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.1\
+								lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+
+The Roslyn package depends on the "Microsoft.Net.Compilers" 1.0.0 package, but only for the
+toolchain (it doesn't add any references to the project).								
+								
+The installer will also add the following target to your *.csproj file:
+
+		<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+			...
+		</Target>
+
+Which will copy the csc.exe compiler to your output folder here:
+
+		bin\roslyn
+
+And add the following to your web.config:
+
+		<system.codedom>
+			<compilers>
+				<compiler language="c#;cs;csharp" extension=".cs"
+				type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"
+				warningLevel="4" compilerOptions="/langversion:6 /nowarn:1659;1699;1701"/>
+				<compiler language="vb;vbs;visualbasic;vbscript" extension=".vb"
+				type="Microsoft.CodeDom.Providers.DotNetCompilerPlatform.VBCodeProvider, Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35"
+				warningLevel="4" compilerOptions="/langversion:14 /nowarn:41008 /define:_MYTYPE=\&quot;Web\&quot; /optionInfer+"/>
+			</compilers>
+		</system.codedom>
 
 
 

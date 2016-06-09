@@ -20,12 +20,31 @@ Request.IsAuthenticated = @Request.IsAuthenticated <br />
 System.Threading.Thread.CurrentPrincipal.Identity.Name = @System.Threading.Thread.CurrentPrincipal.Identity.Name [@System.Threading.Thread.CurrentPrincipal.GetType().Name] <br />
 Context.User.Identity.Name = @Context.User.Identity.Name [@Context.User.GetType().Name] <br />
 
+
 <hr />
 
-@{ 
+@{
 
-    /*
-    string x = null;
-    x.ToString();
-    */
+    string foo = "hi";
+
+
+    //string x = null;
+    //x.ToString();
+
 }
+
+@($"this is foo: {foo}")
+
+
+
+<hr />
+
+@foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+{
+    @(a.FullName + " - " + "[" +a.GlobalAssemblyCache +"]")
+    <br />
+}
+
+
+
+
