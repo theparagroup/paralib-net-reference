@@ -12,7 +12,7 @@ upper camel (UC) = "HelloThere"
 lower camel (LC)= "helloThere"
 
 namespaces
-	prefixed with reverse DNS name, lower dotted
+	prefixed with reverse DNS name, lower dotted (e.g. com.paralib.mvc)
 	then upper dotted
 
 typenames
@@ -27,6 +27,12 @@ members
 	methods, public/private properties -> MemberName (upper camel)
 	members involving enums -> TypeName (singular, e.g. RenderMode)
 
+
+=============================================================
+====	Usings
+=============================================================
+
+only what's needed + System
 
 =============================================================
 ====	Database Conventions

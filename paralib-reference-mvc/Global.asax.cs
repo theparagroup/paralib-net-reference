@@ -16,7 +16,10 @@ namespace com.paralib.reference.mvc
             RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             RouteTable.Routes.MapMvcAttributeRoutes();
 
-            Configuration.Configure("mvc",LoggingModes.Mvc);
+            Paralib.Initialize();
+
+            //create web.config entries
+            com.paralib.mvc.Configuration.Configure();
 
             _logger.Info(null);
         }

@@ -1,4 +1,6 @@
-﻿@model com.paralib.reference.mvc.Models.Hello
+﻿@using com.paralib.common
+@using com.paralib.reference.mvc.Models
+@model Hello
 
     <div style="border-style: solid; border-width: 1px;">
         @Model.Message
@@ -11,6 +13,11 @@
     @(m + " - " + HttpContext.Current.ApplicationInstance.Modules[m].GetType().FullName )
     <br/>
 }
+
+<hr />
+
+Dal.Connection=@Paralib.Configuration.Dal.Connection<br />
+Dal.ConnectionString=@Paralib.Configuration.Dal.ConnectionString<br />
 
 <hr />
 
