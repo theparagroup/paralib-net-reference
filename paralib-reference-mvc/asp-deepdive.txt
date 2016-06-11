@@ -31,6 +31,11 @@ Note: Framework and ASP.NET version numbers are the same.
 		AJAX
 		LINQ
 		EF1 (v1)
+		Url Routing (in System.Web.Routing.dll)
+			UrlRoutingModule
+			RouteTable
+			Route
+			etc.
 
 		MVC1 (2009):
 			WebForms
@@ -51,6 +56,9 @@ Note: Framework and ASP.NET version numbers are the same.
 		Razor
 		WebMatrix (2011)
 		SimpleMembership (2011)
+		Url Routing moved into System.Web.dll
+
+
 		MVC3 (2011):
 			ViewBag (ViewData that uses new dynamic ExpandoObject)
 			Global Action Filters
@@ -62,6 +70,7 @@ Note: Framework and ASP.NET version numbers are the same.
 		EF5 (v3)
 		WebPages2 (open sourced)
 		WebAPI (open sourced)
+
 		MVC4 (open sourced):
 			Bundling & Minification
 
@@ -71,7 +80,9 @@ Note: Framework and ASP.NET version numbers are the same.
 		WebAPI2
 		Identity 1.0
 		Identity 2.0 (2014)
+		
 		MVC5:
+			Attribute Routing
 			Scaffolding
 			Authentication Filters
 
@@ -90,9 +101,20 @@ Note: Framework and ASP.NET version numbers are the same.
 Visual Studio 2015 can be configured to use either the developer version of IIS,
 IIS Express, or a local instance of IIS.
 
-When configuring IIS Express, use the following file:
+Settings always start here:
+
+		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\machine.config
+		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
+
+IIS Express additionaly uses the following files:
 
 		{solution}\.vs\config\applicationhost.config
+		{solution}\{application}\{application}.csproj
+
+Then of course:
+
+		{solution}\{application}\web.config
+
 
 For example, if trying to use Windows Authentication with IIS Express, you'll
 need to modify the following entry in applicationhost.config:
@@ -106,7 +128,7 @@ need to modify the following entry in applicationhost.config:
 
 Also, be aware that Visual Studio wants to manage some of these IIS Express
 properties for you. To see these properties, select the project in the solution
-explorer and hit F4:
+explorer and hit F4 (these are in the *.csproj):
 
 		Anonymous Authentication
 		Windows Authentication
@@ -114,7 +136,6 @@ explorer and hit F4:
 		PipeLine Mode (Integrated, Classic)
 		etc.
 		
-
 To use IIS with Visual Studio, ensure you have access to the following folder:
 
 		C:\Windows\System32\inetsrv\config
@@ -126,6 +147,14 @@ And check:
 		Application Pool
 		Port
 		Verify Web Site is running
+
+IIS 7  no longer uses the "metabase" to store its configuration information,
+instead it uses an XML file here:
+
+		C:\Windows\System32\inetsrv\config\applicationHost.config
+
+Note: when you make changes to your application (such as adding or removing mappings) 
+in the IIS management tool, they'll be stored in your application's web.config.
 
 
 =============================================================
@@ -376,6 +405,14 @@ custom users and roles (stored in a database, for example). We'll discuss this n
 ====	ASP.NET Architecture
 =============================================================
 
+In IIS 7, ASP.NET runs in two modes:
+		
+		Classic
+		Integrated
+
+In classic mode, a "Script Map" must be registered for the file extension to be handled. When
+these files are requested, they will go through the ASP.NET pipeline.
+
 Once IIS has mapped an extension to ASP.NET, the request is sent through the ASP.NET Pipeline.
 If this is the first request for the application, the Application Domain is created and many
 other things which we'll skip over here.
@@ -515,7 +552,22 @@ MVC builds upon ASP.NET (System.Web.dll) and extends ASP.NET Routing, which is
 implemented in the UrlRoutingModule class (an HttpModule). MVC uses ASP.NET
 Routing to route requests to Controllers and Actions.
 
-The UrlRoutingModule is usually registered via the IIS or IIS Express configuration.
+The UrlRoutingModule is registered like this:
+
+Classic Mode, using <system.web>:
+
+		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
+			
+
+Integrated Mode, using <system.webServer>
+
+		IIS:
+
+			C:\Windows\System32\inetsrv\config\applicationHost.config
+
+		IIS Express):
+
+			{solution}\.vs\config\applicationhost.config
 
 
 =============================================================

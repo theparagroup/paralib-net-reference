@@ -105,6 +105,7 @@
     <Content Include="Views\Main.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="packages.config" />
+    <Content Include="joe.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

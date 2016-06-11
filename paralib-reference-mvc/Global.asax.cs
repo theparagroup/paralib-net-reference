@@ -1,9 +1,8 @@
 ﻿using System;
-using com.paralib.common;
-using log4net;
 using System.Web.Mvc;
 using System.Web.Routing;
-using com.paralib.common.Logging;
+using log4net;
+using com.paralib.common;
 
 namespace com.paralib.reference.mvc
 {
@@ -16,10 +15,11 @@ namespace com.paralib.reference.mvc
             RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             RouteTable.Routes.MapMvcAttributeRoutes();
 
+            //create web.config entries (move to httpmodule)
+            com.paralib.mvc.Configuration.ConfigurationManager.InitializeWebConfig();
+
             Paralib.Initialize();
 
-            //create web.config entries
-            com.paralib.mvc.Configuration.Configure();
 
             _logger.Info(null);
         }

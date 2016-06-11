@@ -53,5 +53,12 @@ Context.User.Identity.Name = @Context.User.Identity.Name [@Context.User.GetType(
 }
 
 
+<hr />
+
+@foreach (var m in HttpContext.Current.ApplicationInstance.Modules.AllKeys)
+{
+    @(m + " - " + HttpContext.Current.ApplicationInstance.Modules[m].GetType().FullName )
+    <br />
+}
 
 
