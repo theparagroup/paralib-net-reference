@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using log4net;
 using com.paralib.common;
+using com.paralib.common.Configuration;
 
 namespace com.paralib.reference.mvc
 {
@@ -10,17 +11,22 @@ namespace com.paralib.reference.mvc
     {
         private static ILog _logger = LogManager.GetLogger(typeof(Global));
 
+
+        static Global()
+        {
+            _logger.Info("static .ctor");
+            Paralib.Configure += Paralib_Configure;
+        }
+
+        private static void Paralib_Configure(Settings settings)
+        {
+            _logger.Info(null);
+        }
+
         public override void Init()
         {
             _logger.Info(null);
-
             base.Init();
-            
-        }
-
-        private void Paramod_Configure(object sender, EventArgs e)
-        {
-            _logger.Info(null);
         }
 
         protected void Application_OnStart(object sender, EventArgs e)
@@ -32,48 +38,12 @@ namespace com.paralib.reference.mvc
         }
 
 
-        protected void ParaMvcModule_Configure(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-        protected void ParaMvcModule_OnConfigure(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-        protected void ParaMvc_Configure(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-        protected void ParaMvc_OnConfigure(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-
         protected void Session_Start(object sender, EventArgs e)
         {
             _logger.Info(null);
         }
 
-        protected void Session_OnStart(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-        protected void SessionState_Start(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
         protected void Application_BeginRequest(object sender, EventArgs e)
-        {
-            _logger.Info(null);
-        }
-
-        protected void Application_OnBeginRequest(object sender, EventArgs e)
         {
             _logger.Info(null);
         }
