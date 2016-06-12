@@ -95,23 +95,33 @@ Note: Framework and ASP.NET version numbers are the same.
 		Razor 4
 
 =============================================================
-====	IIS and IIS Express
+====	IIS and IIS Express Configuration
 =============================================================
 
 Visual Studio 2015 can be configured to use either the developer version of IIS,
 IIS Express, or a local instance of IIS.
 
-Settings always start here:
+Configuration always starts here:
 
 		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\machine.config
 		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
 
-IIS Express additionaly uses the following files:
+Next, if using IIS Express:
 
 		{solution}\.vs\config\applicationhost.config
 		{solution}\{application}\{application}.csproj
 
-Then of course:
+Or, IIS7:
+
+		C:\Windows\System32\inetsrv\config\applicationHost.config
+
+
+Note: IIS 7  no longer uses the "metabase" to store its configuration information,
+instead it uses the above XML file. When you make changes to your application 
+(such as adding or removing mappings) in the IIS management tool, they'll be 
+stored in your application's web.config.
+
+Finally, of course:
 
 		{solution}\{application}\web.config
 
@@ -140,25 +150,19 @@ To use IIS with Visual Studio, ensure you have access to the following folder:
 
 		C:\Windows\System32\inetsrv\config
 
-And check:
+		And check:
 
-		ISAPI & CGI Restrictions
-		Folder permissions
-		Application Pool
-		Port
-		Verify Web Site is running
+				ISAPI & CGI Restrictions
+				Folder permissions
+				Application Pool
+				Port
+				Verify Web Site is running
 
-IIS 7  no longer uses the "metabase" to store its configuration information,
-instead it uses an XML file here:
 
-		C:\Windows\System32\inetsrv\config\applicationHost.config
-
-Note: when you make changes to your application (such as adding or removing mappings) 
-in the IIS management tool, they'll be stored in your application's web.config.
 
 
 =============================================================
-====	IIS Authentication
+====	IIS Architecture and IIS Authentication
 =============================================================
 
 ASP.NET is implemented as an IIS ISAPI Extension (aspnet_isapi.dll). The IIS 
@@ -173,11 +177,18 @@ IIS creates this access token based on the IIS authentication options, which inc
 		Integrated Windows Authentication (enabled by default)
 		Annonymous Authentication (also enabled by default)
 
-With Basic or Windows, IIS will challenge the web browser for credentials. With anonymous,
-an predefined, existing account will be used for the request. Any of these accounts may
-or may not have access to the actual resource (file).
+These are implemented on the IIS as native Http Modules such as:
 
-How this works has changed over the years:
+		C:\Windows\System32\inetsrv\authsspi.dll
+		C:\Windows\System32\inetsrv\authbas.dll
+		C:\Windows\System32\inetsrv\authanon.dll
+
+With Basic or Windows, IIS will challenge the web browser for credentials. 
+
+With Anonymous, a predefined, existing account will be used for the request. Any of these 
+accounts may or may not have access to the actual resource (file).
+
+How this works (and IIS architecture) has changed over the years:
 
 In II5 (and IIS 5 Isolation Mode in II6), IIS (inetinfo.exe) ran in user mode under SYSTEM,
 and ASP.NET ran in a single worker process (aspnet_wp.exe) under the ASPNET account. The 
@@ -199,10 +210,10 @@ VERSION		IIS Process/Account		ASP.NET Worker Process/Account	IIS Anonymous Accou
 5/2000		inetinfo.exe/SYSTEM		aspnet_wp.exe/ASPNET			IUSR_MachineName
 6/2003		(kernel)				w3wp.exe/NETWORKSERVICE			IUSR_MachineName
 7/2008		(kernel)				w3wp.exe/ApplicationPoolId		IUSR
-8/2012
-10/2016
+8/2012		..						..								..
+10/2016		..						..								..
 
-You can access the account that is actually executing this way:
+You can access the account that is actually executing the code this way:
 
 		System.Security.Principal.WindowsIdentity.GetCurrent().Name
 
@@ -217,6 +228,27 @@ and is always a WindowsIdentity principal (NOT an IPrincipal - see ASP.NET Authe
 
 Note: Microsoft plans to further decouple ASP.NET from IIS via the "Open Web Interface for 
 .NET" (OWIN) standard and project Katana.
+
+
+=============================================================
+====	ASP.NET Impersonation & Delegation
+=============================================================
+
+Normally ASP.NET applications execute using the security context of the worker process. This is
+not to be confused with the IIS-authenticated user (the access token).
+
+If desired, the application can be configured to run in the security context of the requesting
+user, or a completely different user:
+
+	<system.web>
+		<identity impersonate="true" userName="domain\user" password="password" />
+
+Note: impersonation is not supported in II7 Integrated mode, but it is supported in Classic mode.
+
+Note: a related but distinct concept is delegation. This is where IIS bounces the
+user credentials against another server. NTLM doesn't support it, but Kerberos
+and Basic do support it. You can always call LogonUser with "Interactive."
+
 
 
 =============================================================
@@ -260,8 +292,8 @@ It's a mess.
 ====	ASP.NET Security
 =============================================================
 
-ASP.NET provides cryptographic services to applications, for example encrypting "ViewState"
-or "Authentication Tickets".
+ASP.NET provides cryptographic services to applications, for example encrypting 
+"ViewState" or "Authentication Tickets".
 
 Cryptographic settings can be changed with the <machineKey> element in web.config:
 
@@ -309,40 +341,33 @@ Again, these are internal, but you can access the functionality via MachineKey:
 		System.Web.Security.MachineKey.UnProtect()
 
 
-=============================================================
-====	ASP.NET Impersonation & Delegation
-=============================================================
-
-Normally ASP.NET applications execute using the security context of the worker process. This is
-not to be confused with the IIS-authenticated user (the access token).
-
-If desired, the application can be configured to run in the security context of the requesting
-user, or a completely different user:
-
-	<system.web>
-		<identity impersonate="true" userName="domain\user" password="password" />
-
-Note: impersonation is not supported in II7 Integrated mode, but it is supported in Classic mode.
-
-Note: a related but distinct concept is delegation. This is where IIS bounces the
-user credentials against another server. NTLM doesn't support it, but Kerberos
-and Basic do support it. You can always call LogonUser with "Interactive."
-
 
 =============================================================
-====	.NET (and ASP.NET) Authentication
+====	.NET (and ASP.NET) Authentication & IIS
 =============================================================
 
-ASP.NET provides an additional authentication layer that build upon .NET security features
-found in the System.Security namespace. At this layer, we can set the current authenticated 
-user for the current request (and thread) using the following properties:
+ASP.NET provides an additional authentication layer that build upon .NET security 
+features found in the System.Security namespace. These are implemented in managed
+HttpModules that handle the HttpApplication's AuthenticateRequest event (see "Application
+Lifecyle" below), such as:
+
+		DefaultAuthenticationModule
+		WindowsAuthenticationModule
+		FormsAuthenticationModule
+		
+There is also a mechanism to track anonymous users via cookies:
+
+		AnonymousIdentificationModule
+
+At this layer, we can set the current authenticated user for the current request 
+(and thread) using the following properties:
 
 		System.Threading.Thread.CurrentPrincipal
 		System.Web.HttpContext.User
 
-Both of which are of type IPrincipal (NOT WindowsPrincipal, as sent over by IIS). Typically
-these are GenericPrincipal objects, and the DefaultAuthenticationModule will create one
-whether there is an authenticated user or not.
+Both of which are of type IPrincipal (NOT necessarily WindowsPrincipal, as sent over by IIS). 
+Typically these are GenericPrincipal objects, and the DefaultAuthenticationModule will create 
+a Principal whether there is an authenticated user or not.
 
 Unfortunately, these are redundant, and both should point to the same principal and should
 be kept in sync. When setting them in custom authentication schemes, both should be set
@@ -384,7 +409,7 @@ If not using claims, you can ignore these and use the old interfaces and classes
 .NET 4.5, instead of implementing IPrincipal and IIdentity (as in custom Forms Authentication), 
 one should derive from these classes. Instead of custom properties (email, location), use claims.
 
-We use the following web.config entry to configure ASP.NET authentication:
+We use the following web.config entry to configure ASP.NET Authentication:
 
 		<system.web>
 			<authentication mode= "[Windows|Forms|Passport|None]"/>
@@ -394,67 +419,377 @@ Windows or Basic is enabled) and set various properties of the GenericPrincipal 
 token. This is implemented in the WindowsAuthenticationModule (an HttpModule). It is important to 
 understand that IIS actually does the authentication and this module simply populates the principal. 
 
-See also: LOGON_USER and AUTH_TYPE.
-
 "Forms" enables the "Forms Authentication" mechanism where the application can define its own
 custom users and roles (stored in a database, for example). We'll discuss this next.
 
 "None" does nothing, and again allows the application to set the IPrincipal in a custom manner.
 
+You can turn on anonymous user tracking like this:
+
+		<system.web>
+			<anonymousIdentification enabled="true" />
+
+Note: Also see LOGON_USER and AUTH_TYPE.
+
+
 =============================================================
-====	ASP.NET Architecture
+====	ASP.NET Application & Request Lifecycle
 =============================================================
 
-In IIS 7, ASP.NET runs in two modes:
+In IIS7, ASP.NET runs in two modes:
 		
-		Classic
+		Classic (IIS5/6 mode)
 		Integrated
+
+When a request comes into IIS7 Classic Pipeline (or IIS5/IIS6), the extension of 
+the reqested file is matched to a "Script Map" which routes the request to native
+ISAPI extensions. In the case of ASP.NET file types (*.aspx, *.cshtml) these requests 
+go to the aspnet_isapi.dll extension.
+
+In IIS7 Integrated mode, all requests go through a "unified pipeline" where they can
+be handled by either native or managed handlers and modules. ASP.NET is built into
+IIS7.
+
+The first request to either pipeline creates the following object graph:
+
+		ApplicationManager
+			AppDomain
+				HostingEnvironment 
+				HttpRuntime
+					(pool of HttpApplication objects)
+						app1 - HttpContext
+									HttpApplication
+									HttpRequest
+									HttpResponse
+									HttpApplicationState
+									HttpSessionState
+						app2 - HttpContext
+									HttpApplication
+									HttpRequest
+									HttpResponse
+									HttpApplicationState
+									HttpSessionState
+
+Note: Since there are many HttpApplication objects in the pool, Init() methods on both
+the application and on each module can be called multiple times. 
+
+Each HttpApplication and corresponding HttpContext object int the pool will serve one
+request on one thread.
+
+If you have a Global.asax defined in your application, the runtime will create 
+instances of that for the application object (Global.asax is derive from 
+HttpApplication). HttpApplication defines several events (discussed below), but
+it is important to understand that there are several additional "psuedo events"
+that you can handle in Global.asax that are not part of the HttpApplication
+class:
+
+		Application_Start
+		Session_End
+		Application_End
+
+As we'll see next, these events are fired outside of the context of a request,
+such as when the first request is served after the application is loaded.
+
+Classic Pipeline Lifecyle:
+
+	1] HttpApplication.Application_Start() is called once per lifetime
+	2] HttpModules are created for each application object in the pool
+	3] HttpModules are initialized: IHttpModule.Init()
+	4] HttpApplication.Init() is called for each application object in the pool
+
+Classic Pipeline Code Path:
+
+	System.Web.Hosting.ISAPIRuntime.ProcessRequest()
+	...
+		HttpApplicationFactory.GetApplicationInstance()
+			HttpApplicationFactory.EnsureAppStartCalled()
+				Application_Start() - global.asax psuedo event
+			HttpApplicationFactory.GetNormalApplicationInstance()
+				HttpApplication.InitInternal()
+					HttpApplication.InitModules()
+						foreach (module){ HttpModule.ctor() }
+						HttpApplication.InitModulesCommon()
+							foreach (module){ HttpModule.Init() }
+					HttpApplication.HookupEventHandlersForApplicationAndModules()
+					HttpApplication.Init() 
+
+
+Integrated Pipeline Lifecyle:
+
+	1] HttpApplication.Application_Start() is called once per lifetime
+	2] HttpModules are created for each application object in the pool
+	3] HttpApplication.Init() is called for each application object in the pool
+	4] HttpModules are initialized: IHttpModule.Init()
+
+Integrated Pipeline Code Path:
+
+	System.Web.Hosting.PipelineRuntime.InitializeApplication()
+		System.Web.HttpApplicationFactory.GetPipelineApplicationInstance()
+			HttpApplicationFactory.GetSpecialApplicationInstance
+				HttpApplication.InitSpecial()
+					HttpApplication.RegisterEventSubscriptionsWithIIS()
+						HttpApplicationFactory.GetModuleCollection()
+							foreach (module){ HttpModule.ctor() }
+						HttpApplication.HookupEventHandlersForApplicationAndModules()
+						HttpApplicationFactory.EnsureAppStartCalledForIntegratedMode()
+							Application_Start() - global.asax psuedo event 
+						HttpApplication.Init() 
+						foreach (module){ HttpModule.Init() }
+
+
+Note: the classic and integrated pipelines swap the order of the HttpModules Init() and 
+the HttpApplication Init(). This is a "breaking change" for the Integrated Pipeline.
+
+HttpModule Lifecyle:
+
+		Init()
+		(handle requests via HttpApplication events)
+		Dispose()
+
+Note: The Dispose() method of the IHttpModule interface is NOT part of the "Dispose
+Pattern", i.e. IDisposable. Rather it is called when the HttpApplication is destroyed
+by the HttpRuntime (whenever that may be). Here is the code path:
+
+		HttpRuntime.Dispose()
+			HttpApplicationFactory.Dispose()
+				HttpApplicationFactory.DisposeHttpApplicationInstances()
+					HttpApplication.DisposeInternal()
+						HttpModule.Dispose()
+
+Note: HttpModules are processed in the order they are registered.
+
+As each request is serviced, various HttpApplication events are raised, such as:
+
+		BeginRequest
+		AuthenticateRequest
+		AuthorizeRequest
+		ResolveRequestCache
+		PostResolveRequestCache
+			(find the HttpHandler for this extension at this point)
+			(some handlers may invoke a BuildProvider e.g. Razor Web Pages)
+		ProcessRequest
+		EndRequest
+
+IIS7 Integrated Mode adds the follwing new events:
+
+		 MapRequestHandler
+		 LogRequest
+		 PostLogRequest 
+
+HttpModules can handle these events to modify the request pipeline behavior, for
+example, a module could call HttpContext.RemapHandler() in PostResolveRequestCache
+to dynamically serve content.
+
+Global.asax can handle these events too:
+
+		Application_BeginRequest
+		Application_AuthenticateRequest
+		Application_AuthorizeRequest
+		Application_ProcessRequest
+		Application_EndRequest
+
+Note: for backwards compatibility with ASP (classic ASP, not .NET), you can use
+an alternate signature:
+
+		Application_OnStart
+		Application_OnBeginRequest
+		Application_OnEnd
+		etc
+
+HttpModules may raise events as well. Global.asax can handle these using similar
+signature syntax:
+
+		{friendlyname}_{eventname}
+
+Where "friendlyname" is the "name" attribute in the web.config:
+
+		<httpModules>
+			<add type="com.paralib.SomeVeryCoolModule, paralib" name="Cool" />
+		</httpModules>
+
+Would look like this in global.asax:
+
+		protected void Cool_EventName(object sender, EventArgs e)
+        {
+        }
+
+
+Note: this will not work with DynamicModules! Currently the DynamicModuleHelper class
+(in Microsoft.Web.Infrastructure) creates friendlynames like this:
+
+		"__DynamicModule_com.paralib.SomeVeryCoolModule,paralib, Version=1.0.0.0, Culture=neutral, 
+		PublicKeyToken=null_1586a9a1-695a-4da0-8ca4-9f4a19e75b6e""
+
+Which are not very friendly and will not "autowire" in global.asax.
+
+You could do the following in your HttpApplication.Init() method:
+ 
+            var module = (com.paralib.SomeVeryCoolModule)this.Modules[
+							"__DynamicModule_com.paralib.SomeVeryCoolModule, 
+							paralib-, Version=1.0.0.0, Culture=neutral, 
+							PublicKeyToken=null_1586a9a1-695a-4da0-8ca4-9f4a19e75b6e"];
+
+            module.EventName += Module_EventName;
+
+But that is ridiculous.
+
+Note: The session events are a bit strange. Session_Start is raised by the 
+SessionStateModule (friendlyname="Session"), but Session_End is actually a psuedo event 
+that is fired by the HttpApplicationFactory in response to a signal from the SessionState class.
+
+Note: Visual Studio can't debug application start up in IIS, as it attaches after most of this
+stuff happens. However, you can do this in IIS Express.
+
+
+=============================================================
+====	Build Providers 
+=============================================================
+
+(TODO later)
+
+
+
+=============================================================
+====	Zero Configuration of HttpModules & BuildProviders
+=============================================================
+
+TODO
+TODO
+TODO
+ rework
+TODO
+TODO
+TODO
+
+
+Since Web Pages are implemented as HttpModules you may expect to see registration 
+entries in your Web.config files like this:
+
+		<configuration>
+		  <system.web>
+			<httpModules>
+			  <add name="HelloWorldModule" type="HelloWorldModule"/>
+			 </httpModules>
+		  </system.web>
+		</configuration>
+
+Or because Razor uses BuildProviders, something like this:
+
+		<compilation debug=”false”>
+		 <buildProviders>
+		  <remove extension=”.xsd”/>
+		  <add appliesTo=”Code” extension=”.xsd” type=”Msdn.Samples.Compilation.XsdClassBuildProvider”/>
+		 </buildProviders>
+		</compilation>
+ 
+However, in ASP.NET 4 the PreApplicationStartMethodAttribute (System.Web.dll) was added, 
+allowing for zero-config ASP.NET applications. This attribute is used at the assembly 
+level and allows startup code to run before Application_Start. 
+
+Used with the DynamicModuleUtility class (Microsoft.Web.Infrastructure.dll), assemblies 
+such as System.Web.WebPages.dll can register thier HttpModule as soon as they are loaded.
+
+The Razor BuildProviders for VB (*.vbhtml) and C# (*.cshtml) are installed by default for
+MVC applications. This is also accomplished via the PreApplicationStartMethod attribute
+(in System.Web.WebPages.Razor.dll), so when that assembly is loaded, so is Razor.
+
+The Razor build providers are registered using the System.Web.Compilation.BuildProvider 
+class like this:
+
+		BuildProvider.RegisterBuildProvider(".cshtml", typeof(RazorBuildProvider));
+		BuildProvider.RegisterBuildProvider(".vbhtml", typeof(RazorBuildProvider));
+
+You can also dynamically add a referenced assembly (as you would in the <assemblies> 
+section of web.config) with:
+
+		System.Web.Compilation.BuildManager.AddReferencedAssembly()
+
+
+=============================================================
+====	Configuring HttpHandlers
+=============================================================
+
+The ASP.NET Pipeline will not be invoked unless a file extension matches
+a mapped HttpHandler.
+
+
+httphandlers are searched in the order they are registered
+
+IIS6 workarounds for extensionless mapping:
+		runAllManagedModulesForAllRequests  (RAMMFAR)
+		*.* mappings
+		*.mvc mappings
+		aspnet_filter.dll that appends “/eurl.axd/GUID"
+
+
+
+TODO
+TODO
+
+IIS7 Classic:
+
+	script map extension to isapi & managed handler
+	script map extension to isapi & routehandler + remap
+
+
+IIS7 Integrated:
+
+	managed handler
+	"*." -> TransferRequestHandler & routehandler + remap
+	"*.cshtml" -> HttpForbiddenHandler & routehandler +remap
+
+preconditions for integrated/classic, 32/64
+
+
+
+
+
+TODO
+TODO
+TODO
+TODO
 
 In classic mode, a "Script Map" must be registered for the file extension to be handled. When
 these files are requested, they will go through the ASP.NET pipeline.
 
-Once IIS has mapped an extension to ASP.NET, the request is sent through the ASP.NET Pipeline.
-If this is the first request for the application, the Application Domain is created and many
-other things which we'll skip over here.
 
-A new HttpApplication object is created (or reused from a pool). If your application has a 
-Global.asax defined, then that will be instantiated. Otherwise the base class will be.
+=============================================================
+====	ASP.NET Routing 
+=============================================================
 
-If this is the first request through the pipeline, then the following method will be called:
 
-		Application_Start(...)
+TODO
+TODO
+TODO
 
-For all requests:
+httphandlers in the past only worked for files with extensions
 
-		Application_BeginRequest(...)
-		Application_Error(...)
-		Application_EndRequest(...)
+extensionless handler (and ii6 workaround)
 
-If (when) the application is unloaded:
+by default routing is bypassed for existing files
 
-		Application_End(...)
+routing existing files:
 
-There are additional methods and events that can be hooked into in Global.asax:
+		RouteTable.Routes.RouteExistingFiles = true;
+        RouteTable.Routes.Add("foo route",new Route("{filename}.foo", new Foo()));
 
-		Session Events
-		Request Events
-		Module Events
+		or use any old stupid handler to get the pipeline running
 
-Note: some events are proper .NET events (such as )
+		IRouteHandler
 
-The HttpContext object is created and wired-up as follows:
+TODO
+TODO
+TODO
 
-		HttpContext
-			HttpApplication ApplicationInstance {get;}
-			HttpApplicationStateBase Application {get;}
-			HttpRequestBase Request {get;}
-			HttpResponseBase Response {get;}
-			HttpServerUtilityBase Server {get;}
-			HttpSessionStateBase Session {get;}
 
-pseudo envents
+MVC builds upon ASP.NET (System.Web.dll) and extends ASP.NET Routing, which is 
+implemented in the UrlRoutingModule class (an HttpModule). MVC uses ASP.NET
+Routing to route requests to Controllers and Actions.
 
-SessionState_OnStart?
+
+
+
+
 
 
 =============================================================
@@ -545,34 +880,36 @@ state of change, and still pretty heavy.
 
 
 =============================================================
-====	ASP.NET Routing vs MVC
-=============================================================
-
-MVC builds upon ASP.NET (System.Web.dll) and extends ASP.NET Routing, which is 
-implemented in the UrlRoutingModule class (an HttpModule). MVC uses ASP.NET
-Routing to route requests to Controllers and Actions.
-
-The UrlRoutingModule is registered like this:
-
-Classic Mode, using <system.web>:
-
-		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
-			
-
-Integrated Mode, using <system.webServer>
-
-		IIS:
-
-			C:\Windows\System32\inetsrv\config\applicationHost.config
-
-		IIS Express):
-
-			{solution}\.vs\config\applicationhost.config
-
-
-=============================================================
 ====	ASP.NET Web Forms vs Web Pages (and Razor)
 =============================================================
+
+TODO
+TODO
+TODO
+
+ rework
+
+ WebPagesDeployment & version
+
+	   <appSettings>
+		<add key="webpages:Enabled" value="false" />
+	  </appSettings>
+
+"*.cshtml" -> HttpForbiddenHandler & routehandler +remap
+
+
+WebPageHttpModule
+	PostResolveCache
+		Remap
+
+
+WebPageRoute
+
+BuildManagerWrapper
+
+TODO
+TODO
+TODO
 
 Web Forms (*.aspx and *ascx files) are the original ASP.NET HTML rendering mechanism,
 replacing the classic ASP paradigm (similar to but predating the similar PHP and JSP).
@@ -621,51 +958,7 @@ view classes and technically not Razor or Web Pages.
 
 
 
-=============================================================
-====	Zero Configuration (PreApplicationStartMethodAttribute)
-=============================================================
 
-Since Web Pages are implemented as HttpModules you may expect to see registration 
-entries in your Web.config files like this:
-
-		<configuration>
-		  <system.web>
-			<httpModules>
-			  <add name="HelloWorldModule" type="HelloWorldModule"/>
-			 </httpModules>
-		  </system.web>
-		</configuration>
-
-Or because Razor uses BuildProviders, something like this:
-
-		<compilation debug=”false”>
-		 <buildProviders>
-		  <remove extension=”.xsd”/>
-		  <add appliesTo=”Code” extension=”.xsd” type=”Msdn.Samples.Compilation.XsdClassBuildProvider”/>
-		 </buildProviders>
-		</compilation>
- 
-However, in ASP.NET 4 the PreApplicationStartMethodAttribute (System.Web.dll) was added, 
-allowing for zero-config ASP.NET applications. This attribute is used at the assembly 
-level and allows startup code to run before Application_Start. 
-
-Used with the DynamicModuleUtility class (Microsoft.Web.Infrastructure.dll), assemblies 
-such as System.Web.WebPages.dll can register thier HttpModule as soon as they are loaded.
-
-The Razor BuildProviders for VB (*.vbhtml) and C# (*.cshtml) are installed by default for
-MVC applications. This is also accomplished via the PreApplicationStartMethod attribute
-(in System.Web.WebPages.Razor.dll), so when that assembly is loaded, so is Razor.
-
-The Razor build providers are registered using the System.Web.Compilation.BuildProvider 
-class like this:
-
-		BuildProvider.RegisterBuildProvider(".cshtml", typeof(RazorBuildProvider));
-		BuildProvider.RegisterBuildProvider(".vbhtml", typeof(RazorBuildProvider));
-
-You can also dynamically add a referenced assembly (as you would in the <assemblies> 
-section of web.config) with:
-
-		System.Web.Compilation.BuildManager.AddReferencedAssembly()
 
 =============================================================
 ====	MVC Overview

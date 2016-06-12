@@ -10,26 +10,70 @@ namespace com.paralib.reference.mvc
     {
         private static ILog _logger = LogManager.GetLogger(typeof(Global));
 
-        protected void Application_Start(object sender, EventArgs e)
+        public override void Init()
+        {
+            _logger.Info(null);
+
+            base.Init();
+            
+        }
+
+        private void Paramod_Configure(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void Application_OnStart(object sender, EventArgs e)
         {
             RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             RouteTable.Routes.MapMvcAttributeRoutes();
 
-            //create web.config entries (move to httpmodule)
-            com.paralib.mvc.Configuration.ConfigurationManager.InitializeWebConfig();
-
-            Paralib.Initialize();
-
-
             _logger.Info(null);
         }
+
+
+        protected void ParaMvcModule_Configure(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void ParaMvcModule_OnConfigure(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void ParaMvc_Configure(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void ParaMvc_OnConfigure(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
 
         protected void Session_Start(object sender, EventArgs e)
         {
             _logger.Info(null);
         }
 
+        protected void Session_OnStart(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void SessionState_Start(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
         protected void Application_BeginRequest(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+        }
+
+        protected void Application_OnBeginRequest(object sender, EventArgs e)
         {
             _logger.Info(null);
         }
