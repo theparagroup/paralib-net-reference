@@ -158,8 +158,23 @@ To use IIS with Visual Studio, ensure you have access to the following folder:
 				Port
 				Verify Web Site is running
 
+Note: Visual Studio installs the "PageInspector" assembly in your machine's 
+web.config here:
 
+		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\web.config
 
+This thing can do some screwy things to your ASP.NET Lifecycle (loading, unloading
+assemblies, calling Application_Start multiple times, etc.)
+
+Remove it like this if you want:
+
+		<system.web>
+			<compilation>
+				<assemblies>
+					<remove assembly="Microsoft.VisualStudio.Web.PageInspector.Loader, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+				</assemblies>
+			</compilation>
+		</system.web>
 
 =============================================================
 ====	IIS Architecture and IIS Authentication

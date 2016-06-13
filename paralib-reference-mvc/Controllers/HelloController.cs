@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using com.paralib.reference.mvc.Models;
-using log4net;
+using com.paralib.common;
 
 namespace com.paralib.reference.mvc.Controllers
 {
     public class HelloController : Controller
     {
-        private static ILog _logger = LogManager.GetLogger(typeof(HelloController));
+        private static ILog _logger = Paralib.GetLogger(typeof(HelloController));
 
         [Route("hello/index")]
         public ActionResult Index()

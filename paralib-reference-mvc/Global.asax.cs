@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
-using log4net;
 using com.paralib.common;
 using com.paralib.common.Configuration;
 
@@ -9,7 +8,7 @@ namespace com.paralib.reference.mvc
 {
     public class Global : System.Web.HttpApplication
     {
-        private static ILog _logger = LogManager.GetLogger(typeof(Global));
+        private static ILog _logger = Paralib.GetLogger(typeof(Global));
 
 
         static Global()
@@ -21,6 +20,9 @@ namespace com.paralib.reference.mvc
         private static void Paralib_Configure(Settings settings)
         {
             _logger.Info(null);
+
+            //programatically override paralib settings here
+
         }
 
         public override void Init()
@@ -51,6 +53,17 @@ namespace com.paralib.reference.mvc
         protected void Application_AuthenticateRequest(object sender, EventArgs e)
         {
             _logger.Info(null);
+        }
+
+        protected void Application_AuthorizeRequest(object sender, EventArgs e)
+        {
+            _logger.Info(null);
+
+        }
+
+        protected void Application_PostMapRequestHandler(object sender, EventArgs e)
+        {
+            _logger.Info(Context.CurrentHandler?.GetType().Name);
         }
 
         protected void Application_Error(object sender, EventArgs e)
