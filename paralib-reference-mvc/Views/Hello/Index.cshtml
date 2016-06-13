@@ -6,7 +6,13 @@
     HttpContext.Current.Session["foo"] = 0;
 }
 
+Config=@(System.IO.Path.GetDirectoryName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)) <br />
+Paralib.Connection= @(Paralib.Configuration.Connection) <br />
+Paralib.ConnectionString= @(Paralib.Configuration.ConnectionString) <br />
+Paralib.Dal.Connection= @(Paralib.Configuration.Dal.Connection) <br />
+Paralib.Dal.ConnectionString= @(Paralib.Configuration.Dal.ConnectionString) <br />
 Logging= @(Paralib.Configuration.Logging.Enabled) <br />
+Test= @(Paralib.Configuration.AppSettings["test"]) <br />
 
     <div style="border-style: solid; border-width: 1px;">
         @Model.Message
