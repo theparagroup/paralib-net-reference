@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Mvc;
 using com.paralib.reference.mvc.Models;
-using com.paralib.common;
+using com.paralib;
 
 namespace com.paralib.reference.mvc.Controllers
 {
