@@ -7,11 +7,28 @@
 }
 
 Config=@(System.IO.Path.GetDirectoryName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)) <br />
+HasParalibOverride=@(com.paralib.Configuration.ConfigurationManager.HasParalibOverride) <br />
+HasConnectionStringsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasConnectionStringsOverrides) <br />
+HasAppSettingsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasAppSettingsOverrides) <br />
+HasLog4NetOverride=@(com.paralib.Configuration.ConfigurationManager.HasLog4NetOverride) <br />
+Logging.Enabled= @(Paralib.Configuration.Logging.Enabled) <br />
+Logging.Level= @(Paralib.Configuration.Logging.Level.ToString()) <br />
+
+@{
+
+    foreach (var log in Paralib.Configuration.Logging.Logs)
+    {
+        @(log.Name + " [" + log.Type + "][" + log.LoggerType +"]" ) <br />
+    }
+
+}
+
+
+<hr />
 Paralib.Connection= @(Paralib.Configuration.Connection) <br />
 Paralib.ConnectionString= @(Paralib.Configuration.ConnectionString) <br />
 Paralib.Dal.Connection= @(Paralib.Configuration.Dal.Connection) <br />
 Paralib.Dal.ConnectionString= @(Paralib.Configuration.Dal.ConnectionString) <br />
-Logging= @(Paralib.Configuration.Logging.Enabled) <br />
 Test= @(Paralib.Configuration.AppSettings["test"]) <br />
 
     <div style="border-style: solid; border-width: 1px;">
