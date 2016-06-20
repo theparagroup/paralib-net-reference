@@ -7,6 +7,7 @@ namespace paralib_reference_console
     {
         static void Main(string[] args)
         {
+
             System.Threading.Thread.CurrentPrincipal = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity("joe"),new string[] { });
 
             Paralib.Initialize();
