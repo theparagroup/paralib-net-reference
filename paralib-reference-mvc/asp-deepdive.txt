@@ -1272,3 +1272,21 @@ X-Requested-With: XMLHttpRequest
 Html.Raw is used. Html.AntiForgeryToken()
 AntiXSS NuGet (if you need to accept HTML from users)
 
+=============================================================
+====	Threading
+=============================================================
+
+agile threads
+
+when can a thread switch?
+	anytime?
+	between events?
+	after application_beginrequest?
+	after handler ctor?
+	async handlers or modules?
+
+seems sets culture and iprinciple are copied during threadswitch but not TLS
+
+
+
+
