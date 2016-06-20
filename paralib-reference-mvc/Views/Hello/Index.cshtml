@@ -7,10 +7,12 @@
 }
 
 Config=@(System.IO.Path.GetDirectoryName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)) <br />
-HasParalibOverride=@(com.paralib.Configuration.ConfigurationManager.HasParalibOverride) <br />
+Paralib = @(com.paralib.Configuration.ConfigurationManager.ParalibSection==null?"no":"yes") 
+@(com.paralib.Configuration.ConfigurationManager.HasParalibOverride?"(overide)":"") <br />
+Log4Net = @(com.paralib.Configuration.ConfigurationManager.Log4NetSection == null ? "no" : "yes") 
+@(com.paralib.Configuration.ConfigurationManager.HasLog4NetOverride ? "(overide)" : "") <br />
 HasConnectionStringsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasConnectionStringsOverrides) <br />
 HasAppSettingsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasAppSettingsOverrides) <br />
-HasLog4NetOverride=@(com.paralib.Configuration.ConfigurationManager.HasLog4NetOverride) <br />
 Logging.Enabled= @(Paralib.Configuration.Logging.Enabled) <br />
 Logging.Level= @(Paralib.Configuration.Logging.Level.ToString()) <br />
 
@@ -18,7 +20,7 @@ Logging.Level= @(Paralib.Configuration.Logging.Level.ToString()) <br />
 
     foreach (var log in Paralib.Configuration.Logging.Logs)
     {
-        @(log.Name + " [" + log.Type + "][" + log.LoggerType +"]" ) <br />
+        @(log.Name + $"({log.Enabled})" + " [" + log.LogType + "][" + log.LoggerType +"]" ) <br />
     }
 
 }
