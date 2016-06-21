@@ -913,13 +913,6 @@ setting up authorization, use PostAuthenticateRequest.
 
 
 =============================================================
-====	URL Authorization
-=============================================================
-
-urlauthorizationmodule
-
-
-=============================================================
 ====	Membership & Identity Frameworks
 =============================================================
 
@@ -1322,26 +1315,25 @@ And add the following to your web.config:
 ====	Forms Authentication & MVC
 =============================================================
 
+When using MVC (and ASP.NET routes), we don't use the UrlAuthorizationModule.
 
-use anonymous
+Instead, we use the MVC [Authorize] attribute, which is an "authorization filter" that sends
+back a 401 if the user is not authorized.
 
-app domain user
-aspnet
-net serv
+Before MVC3, it was difficult to secure all of your controllers. The solution was usually
+to create a base controller with the attribute applied. In MVC3 global action filters were
+introduced.
 
-client impersonation
-app impersonation
+In MVC4, the [AllowAnonymous] was introduced, which works with the [Authorize] attribute
+to allow anonymous access to login actions.
 
-request user
+You can create custom authorization attributes and apply them globally, controller-level, or
+on an action.
 
-iis vs asp authentication
-asp impersonation
- asp identity
+MVC5, introduces "Authentication Filters" which run before action filters, and allow you 
+to change the principal via filter, and redirect to a login page via a challenge method. 
+Presumably you could replace Forms Authentication with one of these.
 
- thread user vs httpcontext user
-
-Crypto.HashPassword(password)
-Crypto.VerifyHashedPassword
 
 =============================================================
 ====	Forms Authentication & Ajax
@@ -1352,8 +1344,8 @@ if (401) reload()
 302
 
 HttpResponse.SuppressFormsAuthenticationRedirect
-Request.IsAjaxRequest
 
+Request.IsAjaxRequest
 X-Requested-With: XMLHttpRequest
 
 
