@@ -356,7 +356,6 @@ Again, these are internal, but you can access the functionality via MachineKey:
 		System.Web.Security.MachineKey.UnProtect()
 
 
-
 =============================================================
 ====	.NET (and ASP.NET) Authentication & IIS
 =============================================================
@@ -446,6 +445,16 @@ You can turn on anonymous user tracking like this:
 
 Note: Also see LOGON_USER and AUTH_TYPE.
 
+=============================================================
+====	Using Declarative Security
+=============================================================
+
+You can control access to code using the IPrincipal object via attributes such as:
+
+		[PrincipalPermission(SecurityAction.Demand, Authenticated = true)]
+		public class Something
+		{
+		}
 
 =============================================================
 ====	ASP.NET Application & Request Lifecycle
@@ -610,6 +619,8 @@ an alternate signature:
 		Application_OnBeginRequest
 		Application_OnEnd
 		etc
+
+TODO: Do application-level events fire after modules-level events? It seems so.
 
 HttpModules may raise events as well. Global.asax can handle these using similar
 signature syntax:
@@ -808,15 +819,98 @@ Routing to route requests to Controllers and Actions.
 
 
 =============================================================
-====	Forms Authentication
+====	Forms Authentication & URL Authorization
 =============================================================
 
-genericprincipal
-formsidentity
-formsauthenticationticket
-formsauthenticationmodule
-defaultauthenticaionmodule
-skipauth
+A request has an "authenticated user" when there is a IPrincipal object in 
+HttpContext (syncronized with Thread.CurrentPrincipal). This "authenticated"
+user may be anonymous, if the user name is empty and/or IsAuthenticated returns
+false.
+
+By default, there are several key HttpModules we need to understand, that are executed
+in the following order:
+
+		WindowsAuthenticationModule
+		FormsAuthenticationModule
+		DefaultAuthenticationModule
+		UrlAuthorizationModule
+
+The Windows module is enabled by setting:
+
+		<authentication mode="Windows">
+
+If enabled, it tries to set the IPrinciple with the user from IIS during the AuthenticateRequest 
+event. Otherwise it will use the Windows AnonymousIdentity or try to create it from the 
+worker request.
+
+The Forms module's AuthenticateRequest runs next. If not enabled, or it there is already a principal, 
+it does nothing. It fires its own FormsAuthenticate event and if a handler creates a user then that 
+will become the principal. Otherwise it will look for an ecrypted "ticket" (FormsAuthenticationTicket)
+inside an "auth cookie", if there is no ticket (or if the ticket has expired), it does nothing.
+
+If there is a ticket, then it "renews" the ticket and creates a GenericPrinciple with a FormsIdentity
+using the information in the ticket, and saves the encrypted ticket back into the cookie.
+
+Lastly, at this stage of the request, the forms module will look and see if the request is for the
+login page (configured in the <authentication><forms> element), and set the HttpContext's SkipAuthorization
+property to true.
+
+Note: All encryption is done using the built-in ASP encryption and keys. See the section 
+"ASP.NET Security" for more.
+
+Next the DefaultAuthenticationModule's handler runs. This works differently depending on the mode.
+
+In classic mode, this module hooks the HttpApplication's DefaultAuthentication event, which fires when
+there is no authentication (no principal in HttpContext), which in turn fires the global.asax's
+DefaultAuthentication_OnAuthenticate event. None of this is supported in integrated mode.
+
+In integrated mode, the module hooks the PostAuthenticateRequest, and throws no event.
+
+In either case, if the Http status is greater than 200, nothing. Otherwise, if there is no authenticated
+user (prinical) then fire the event (classic mode only) and use the created user. If no user is
+created, then creat a GenericPrinical with a GenericIdentity (anonymous).
+
+Note: the DefaultAuthenticationModule module lives in "BackStopAuthentication.cs"
+
+Next the UrlAuthorizationModule's AuthorizeRequest handler fires. If the HttpContext's SkipAuthorization
+is set, nothing. Otherwize, the IPrincipal is checked against the access rules in the config file,
+and if the user doesn't have access, the statas is set to 401 (unauthorized) and the pipeline jumps
+to the EndRequest event (no handler is served).
+
+The Windows and Default modules don't handle EndRequest, but Forms does. If not a 401, then nothing.
+If the Response.SuppressFormsAuthenticationRedirect is set, nothing. Otherwise, send a 302 redirect
+to the login page in the config file. When doing the redirect, we save the "ReturnUrl" so that the login
+page can redirect to the original page on success. If the redirect or return also gets a 401, then 
+pass that back to the browser so we don't loop infinitely. 
+
+Note: Ajax calls generally want the 401 not the 302.
+
+At this point, we either have the page we wanted to see or we are at the login page.
+
+If the user has the proper credentials, the login page should:
+
+		create a FormsAuthentication ticket with the user name (and optional user data)
+		serialize the ticket
+		encrypt it
+		create a cookie using the cookie name in the config file and the encrypted ticket
+		redirect the user to the originally requested page (ReturnUrl)
+
+Note: there are helper methods in the FormsAuthentication class to do most of this, but these
+steps can be done in user code as well.
+
+You can replace the principal with a custom object (to support custom roles, ect) in either of these:
+
+		Application_AuthenticateRequest
+		Application_PostAuthenticateRequest
+
+Make sure you set both:
+
+		HttpContext.Current.User
+		Thread.CurrentPrincipal
+
+Logically, if you are setting the identity, favor AuthenticateRequest. If you are add roles or otherwise
+setting up authorization, use PostAuthenticateRequest.
+
 
 =============================================================
 ====	URL Authorization

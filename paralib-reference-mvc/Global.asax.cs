@@ -28,7 +28,16 @@ namespace com.paralib.reference.mvc
         public override void Init()
         {
             _logger.Info(null);
+
+            this.BeginRequest += Global_BeginRequest;
+
+
             base.Init();
+        }
+
+        private void Global_BeginRequest(object sender, EventArgs e)
+        {
+            _logger.Info(null);
         }
 
         protected void Application_OnStart(object sender, EventArgs e)
@@ -44,6 +53,7 @@ namespace com.paralib.reference.mvc
         {
             _logger.Info(null);
         }
+
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
