@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{31E5B564-9462-48AB-9BBF-7BC58909F99E}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{56F273B4-9F97-4772-8606-9FAC3F0D71BD}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>com.paralib.reference.console</RootNamespace>
-    <AssemblyName>paralib-reference-console</AssemblyName>
+    <RootNamespace>com.paralib.reference.migrations</RootNamespace>
+    <AssemblyName>paralib-reference-migrations</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,8 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentMigrator">
+      <HintPath>..\..\paralib-net-dependencies\packages\FluentMigrator.1.6.2\lib\40\FluentMigrator.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,21 +43,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="062120160001-InitialSchema.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\paralib-net\paralib-common\paralib-common.csproj">
       <Project>{101e2741-5a3d-460b-bdf4-f5e5bd27cf1c}</Project>
       <Name>paralib-common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\paralib-net\paralib-dal\paralib-dal.csproj">
-      <Project>{be7e9259-7abd-440f-b58a-2a2d6a5f525e}</Project>
-      <Name>paralib-dal</Name>
+    <ProjectReference Include="..\..\paralib-net\paralib-migrations\paralib-migrations.csproj">
+      <Project>{9fb29601-877a-4b69-bbc9-a40673ec1bec}</Project>
+      <Name>paralib-migrations</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="migrate.bat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

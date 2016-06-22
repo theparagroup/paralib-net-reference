@@ -1,41 +1,58 @@
 ﻿using System;
 using com.paralib;
+using com.paralib.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace paralib_reference_console
+namespace com.paralib.reference.console
 {
+
+    class Employee
+    {
+        //[StringLength(2)]
+        //[MinLength(20, ErrorMessage = "too small")]
+        //[MaxLength(2)]
+        public string FirstName { get; set; }
+
+        //[Required]
+        //[Display(Name = "Last Name")]
+        //[String(3)]
+        public string LastName { get; set; }
+
+        [Required]
+        [Display(Name = "Email Address")]
+        [ParaType(ParaTypes.Email)]
+        public string Email { get; set; }
+
+        [ParaType(ParaTypes.Zip4)]
+        public string Zip { get; set; }
+
+
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            Paralib.Configure += Paralib_Configure;
+            var e = new Employee();
+            e.Zip = "12345-1234";
+            e.Email = "no";
 
-            System.Threading.Thread.CurrentPrincipal = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity("joe"),new string[] { });
+            var errors = ObjectValidator.Validate(e);
 
-            Paralib.Initialize();
-            Paralib.RaiseConfigureEvent();
-            
-
-            Console.WriteLine($"logging enabled = {Paralib.Configuration.Logging.Enabled}");
-            Console.WriteLine($"logging debug = {Paralib.Configuration.Logging.Debug}");
-            Console.WriteLine($"logging level = {Paralib.Configuration.Logging.Level}");
-
-            foreach (var l in Paralib.Configuration.Logging.Logs)
+            if (errors!=null)
             {
-                Console.WriteLine($"\tLOG: name={l.Name} type={l.LogType} loggertype={l.LoggerType}");
+                foreach (var r in errors)
+                {
+                    Console.WriteLine($"\t{r.MemberName} - {r.ErrorMessage} ");
+                }
+            }
+            else
+            {
+                Console.WriteLine("valid");
             }
 
-            var log = Paralib.GetLogger("foo");
-            log.Debug();
-            log.Info();
-            log.Warn();
-            log.Error();
-            log.Fatal();
 
         }
 
-        private static void Paralib_Configure(com.paralib.Configuration.Settings settings)
-        {
-            settings.Logging.Logs.Add(new com.paralib.Logging.Log("joe", com.paralib.Logging.LogTypes.Database) { Table = "joe", Pattern = "%.100logger", Fields = "logger" });
-        }
     }
 }

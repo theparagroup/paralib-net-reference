@@ -1,0 +1,38 @@
+﻿@model com.paralib.reference.mvc.Models.Employee
+
+<h2>Employee</h2>
+
+@using (Html.BeginForm())
+{
+
+
+@Html.LabelFor(m => Model.Name)
+@Html.TextBoxFor(m => Model.Name)
+@Html.ValidationMessageFor(m => Model.Name)
+<br />
+
+@Html.LabelFor(m => Model.Email)
+@Html.TextBoxFor(m => Model.Email)
+@Html.ValidationMessageFor(m => Model.Email)
+<br />
+
+
+@Html.LabelFor(m => Model.Age)
+@Html.TextBoxFor(m => Model.Age)
+@Html.ValidationMessageFor(m => Model.Age)
+<br />
+
+@Html.LabelFor(m => Model.Wage)
+@Html.TextBoxFor(m => Model.Wage)
+@Html.ValidationMessageFor(m => Model.Wage)
+<br />
+
+@Html.LabelFor(m => Model.Birthdate)
+@Html.TextBoxFor(m => Model.Birthdate)
+@Html.ValidationMessageFor(m => Model.Birthdate)
+<br />
+
+<input type="submit" value="ok"/>
+
+}
+

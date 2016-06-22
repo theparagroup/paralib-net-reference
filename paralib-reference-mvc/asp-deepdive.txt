@@ -1310,6 +1310,43 @@ And add the following to your web.config:
 		</system.codedom>
 
 
+=============================================================
+====	Validation
+=============================================================
+
+based on System.Componentmodel.DataAnnotations
+
+MaxLength used by EF
+ManLenght/MinLength no client side (use stringlength)
+
+can have serviceproviders, and context items, but these not supported in MVC
+
+can implement IValidateObject
+
+MVC will addtionally validate based on data type
+
+[Required] are fired first, validators should return valid for null data
+
+validators should throw exceptions if datatypes wrong
+
+validators should use newer "IsValid(object value, ValidationContext validationContext)"
+
+validators should use two parameter ValidationResult(message,new string[]{validationContext.MemberName})
+
+validators should use validationContext.DisplayName
+
+[Display] (more options)
+[Range]
+[RegularExpression]
+[Remote]
+
+[DisplayName]? MVC 3?
+[DisplayFormat]
+[ScaffoldColumn]
+
+[MetadataType]
+
+IClientValidatable
 
 =============================================================
 ====	Forms Authentication & MVC
