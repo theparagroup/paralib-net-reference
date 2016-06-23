@@ -1411,5 +1411,8 @@ when can a thread switch?
 seems sets culture and iprinciple are copied during threadswitch but not TLS
 
 
+=============================================================
+====	event subscrption in module problem
+=============================================================
 
-
+see paramodule
