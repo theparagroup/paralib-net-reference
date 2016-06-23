@@ -1246,6 +1246,14 @@ Install Razor 3.2.3 and related assemblies:
 
 Note: Not all of these are required at compile time - and at runtime they run from the GAC.
 
+Note: make sure Visual Studio used the correct versions for the references. Some versions of VS screw
+this up:
+
+		<Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+			<Private>True</Private>
+			<HintPath>..\..\paralib-net-dependencies\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+		</Reference>
+
 Again, for backwards compatibility of older assemblies:
 
 		<runtime>
@@ -1416,3 +1424,9 @@ seems sets culture and iprinciple are copied during threadswitch but not TLS
 =============================================================
 
 see paramodule
+
+
+=============================================================
+====	Unobtrusive Validation
+=============================================================
+
