@@ -1430,3 +1430,5 @@ see paramodule
 ====	Unobtrusive Validation
 =============================================================
 
+<add key="ClientValidationEnabled" value="true" />
+<add key="UnobtrusiveJavaScriptEnabled" value="true" />
