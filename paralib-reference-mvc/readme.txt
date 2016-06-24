@@ -66,3 +66,10 @@ the original. example:
 		}
 
 
+=============================================================
+====	Models
+=============================================================
+dto models go in models assembly
+"view models" go in Models folder in mvc project
+
+

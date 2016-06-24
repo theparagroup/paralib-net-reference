@@ -1,0 +1,77 @@
+﻿@model com.paralib.reference.models.Employee
+
+<h2>Employee</h2>
+
+@{ 
+
+    using (var db = new com.paralib.reference.models.DbContext())
+    {
+        var q = from e in db.Employees
+                select e;
+
+        foreach (var e in q.ToList())
+        {
+            Response.Write(e.Email);// + " [" + e.Company.Name + "]<br />");
+        }
+
+
+        //foreach (var u in q)
+        //{
+        //    Response.Write(u);
+        //}
+
+        //var q = from u in db.Users
+        //        select u;
+
+        //var q = from u in db.Users
+        //        select new { Id= u.Id, Email = u.Email, Password=u.Password, UserTypeId = u.UserTypeId, UserType=u.UserType.Name };
+
+        //TODO binding in MVC and WEBAPI
+
+        //var q = from u in db.Users
+        //        select new TTB.Models.User() { Id = u.Id, Email = u.Email+u.UserType.Name, Password = u.Password, UserTypeId = u.UserTypeId};
+
+        ////string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList(), new Newtonsoft.Json.JsonSerializerSettings(){ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore});
+        //string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList());
+        //Response.Write(json);
+
+        //var l = q.ToList<TTB.Ef.efUser>();
+
+        //foreach (var u in l)
+        //{
+        //    Response.Write(u.Email+" ["+u.UserType.Name+"]<br />");
+        //}
+
+    }
+}
+
+    <hr />
+
+
+    @using (Html.BeginForm())
+    {
+
+        @Html.ValidationSummary()
+
+        <hr />
+
+        @Html.LabelFor(m => Model.Id)
+        @Html.DisplayFor(m => Model.Id)
+        <br />
+
+
+        @Html.LabelFor(m => Model.Name)
+        @Html.TextBoxFor(m => Model.Name)
+        @Html.ValidationMessageFor(m => Model.Name)
+        <br />
+
+        @Html.LabelFor(m => Model.Email)
+        @Html.TextBoxFor(m => Model.Email)
+        @Html.ValidationMessageFor(m => Model.Email)
+        <br />
+
+
+        <input type="submit" value="ok" />
+
+    }
+

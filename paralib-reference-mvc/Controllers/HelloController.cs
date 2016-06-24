@@ -15,21 +15,7 @@ namespace com.paralib.reference.mvc.Controllers
             _logger.Info("hello world");
             return View(new Hello());
         }
-
-        [Route("hello/e")]
-        [HttpGet]
-        public ActionResult Employee()
-        {
-            return View(new Employee());
-        }
-
-        [Route("hello/e")]
-        [HttpPost]
-        public ActionResult Employee(Employee employee)
-        {
-            return View(employee);
-        }
-
+      
 
     }
 }
