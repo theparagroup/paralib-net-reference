@@ -1432,3 +1432,14 @@ see paramodule
 
 <add key="ClientValidationEnabled" value="true" />
 <add key="UnobtrusiveJavaScriptEnabled" value="true" />
+
+HtmlHelper.ClientValidationEnabled = true;
+HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+
+"unobstrusive javascript" - degrade gracefully
+
+MVC3 introduces “Unobtrusive Client Validation” - uses jquery validate instead of older MS stuff
+
+jquery
+jquery-val
+ms unobtrusive
