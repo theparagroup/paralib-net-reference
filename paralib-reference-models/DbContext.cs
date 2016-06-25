@@ -5,10 +5,10 @@ using com.paralib.reference.models.Ef;
 
 namespace com.paralib.reference.models
 {
-    [DbConfigurationType(typeof(efConfiguration))]
-    public class DbContext:efContext
+    [DbConfigurationType(typeof(EfConfiguration))]
+    public class DbContext:EfContext
     {
-        public DbSet<efCompany> Companies { get; set; }
-        public DbSet<efEmployee> Employees { get; set; }
+        public DbSet<EfCompany> Companies { get; set; }
+        public DbSet<EfEmployee> Employees { get; set; }
     }
 }
