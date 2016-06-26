@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContext.cs" />
+    <Compile Include="Ef\DbContext.cs" />
     <Compile Include="Ef\EfCompany.cs" />
     <Compile Include="Ef\EfEmployee.cs" />
     <Compile Include="Employee.cs" />

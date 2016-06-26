@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Data.Entity;
 using com.paralib.Dal.Ef;
-using com.paralib.reference.models.Ef;
 
-namespace com.paralib.reference.models
+namespace com.paralib.reference.models.Ef
 {
     [DbConfigurationType(typeof(EfConfiguration))]
     public class DbContext:EfContext

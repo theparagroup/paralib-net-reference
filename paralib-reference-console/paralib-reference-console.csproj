@@ -33,6 +33,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\paralib-net-dependencies\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\paralib-net-dependencies\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -49,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="paralib.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\paralib-net\paralib-common\paralib-common.csproj">
@@ -58,6 +66,10 @@
     <ProjectReference Include="..\..\paralib-net\paralib-dal\paralib-dal.csproj">
       <Project>{be7e9259-7abd-440f-b58a-2a2d6a5f525e}</Project>
       <Name>paralib-dal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\paralib-reference-models\paralib-reference-models.csproj">
+      <Project>{f7fc6be2-6633-4df5-ba1b-59420d2979fa}</Project>
+      <Name>paralib-reference-models</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
