@@ -6,32 +6,75 @@
     HttpContext.Current.Session["foo"] = 0;
 }
 
-Config=@(System.IO.Path.GetDirectoryName(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile)) <br />
-Paralib = @(com.paralib.Configuration.ConfigurationManager.ParalibSection==null?"no":"yes") 
-@(com.paralib.Configuration.ConfigurationManager.HasParalibOverride?"(overide)":"") <br />
-Log4Net = @(com.paralib.Configuration.ConfigurationManager.Log4NetSection == null ? "no" : "yes") 
-@(com.paralib.Configuration.ConfigurationManager.HasLog4NetOverride ? "(overide)" : "") <br />
-HasConnectionStringsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasConnectionStringsOverrides) <br />
-HasAppSettingsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasAppSettingsOverrides) <br />
-Logging.Enabled= @(Paralib.Configuration.Logging.Enabled) <br />
-Logging.Level= @(Paralib.Configuration.Logging.Level.ToString()) <br />
-
-@{
-
-    foreach (var log in Paralib.Configuration.Logging.Logs)
-    {
-        @(log.Name + $"({log.Enabled})" + " [" + log.LogType + "][" + log.LoggerType +"]" ) <br />
-    }
-
-}
-
+CurrentConfigPath=@(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) <br />
+DotNetConfigPath=@(com.paralib.Configuration.ConfigurationManager.DotNetConfigPath) <br />
+ParalibConfigPath=@(com.paralib.Configuration.ConfigurationManager.ParalibConfigPath) <br />
 
 <hr />
-Paralib.Connection= @(Paralib.Configuration.Connection) <br />
-Paralib.ConnectionString= @(Paralib.Configuration.ConnectionString) <br />
-Paralib.Dal.Connection= @(Paralib.Configuration.Dal.Connection) <br />
-Paralib.Dal.ConnectionString= @(Paralib.Configuration.Dal.ConnectionString) <br />
-Test= @(Paralib.Configuration.AppSettings["test"]) <br />
+
+Paralib = @(com.paralib.Configuration.ConfigurationManager.ParalibSection==null?"no":"yes "+ (com.paralib.Configuration.ConfigurationManager.HasParalibOverride ? "(paralib.config)" : "(web.config)")) <br />
+Log4Net = @(com.paralib.Configuration.ConfigurationManager.Log4NetSection == null ? "no" : "yes " + (com.paralib.Configuration.ConfigurationManager.HasLog4NetOverride ? "(paralib.config)" : "(web.config)")) <br />
+HasConnectionStringsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasConnectionStringsOverrides) <br />
+HasAppSettingsOverrides=@(com.paralib.Configuration.ConfigurationManager.HasAppSettingsOverrides) <br />
+
+<hr />
+
+Log4Net XML : @(com.paralib.Configuration.ConfigurationManager.Log4NetSection.OuterXml)<br />
+
+<hr/>
+
+Logging.Enabled= @(Paralib.Logging.Enabled) <br />
+Logging.Level= @(Paralib.Logging.Level.ToString()) <br />
+Logs:
+<pre>
+@{
+    foreach (var log in Paralib.Logging.Logs)
+    {
+        @("\t"+log.Name + $"({log.Enabled})" + " [" + log.LogType + "][" + log.LoggerType +"]\n" )
+
+    }
+}
+</pre>
+
+<hr />
+Default Database  = @(Paralib.Dal.Database.Name +$"[{Paralib.Dal.Database.GetConnectionString(false)}]") <br />
+Paralib.Dal.Database.Default= @(Paralib.Dal.Databases.Default) <br />
+Paralib.Dal.Database.Sync= @(Paralib.Dal.Databases.Sync) <br />
+
+Paralib.Dal.Database.Databases: <br/>
+
+<pre>
+@{
+    foreach (var db in Paralib.Dal.Databases)
+    {
+        @($"\t{db.Name} [{db.ConnectionType}] [{db.GetConnectionString(false)}]\n") 
+    }
+}
+</pre>
+<hr />
+AppSettings:
+<pre>
+@{
+    System.Collections.Specialized.NameValueCollection appSettings = System.Web.Configuration.WebConfigurationManager.AppSettings;
+    foreach (var k in appSettings.AllKeys)
+    {
+        @($"\t{k}={appSettings[k]}\n") 
+    }
+}
+</pre>
+
+<hr />
+Connection Strings:
+<pre>
+@{
+    foreach (System.Configuration.ConnectionStringSettings cs in System.Web.Configuration.WebConfigurationManager.ConnectionStrings)
+    {
+        @($"\t{cs.Name}={cs.ConnectionString} [{cs.ProviderName}]\n") 
+    }
+}
+</pre>
+
+<hr />
 
     <div style="border-style: solid; border-width: 1px;">
         @Model.Message
@@ -47,10 +90,6 @@ Test= @(Paralib.Configuration.AppSettings["test"]) <br />
 
 <hr />
 
-Dal.Connection=@Paralib.Configuration.Dal.Connection<br />
-Dal.ConnectionString=@Paralib.Configuration.Dal.ConnectionString<br />
-
-<hr />
 
 System.Security.Principal.WindowsIdentity.GetCurrent().Name = @System.Security.Principal.WindowsIdentity.GetCurrent().Name <br />
 Request.LogonUserIdentity.Name = @Request.LogonUserIdentity.Name [ @Request.LogonUserIdentity.AuthenticationType ] <br />
