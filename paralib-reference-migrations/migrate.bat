@@ -1,3 +1,0 @@
-..\..\paralib-net-dependencies\packages\FluentMigrator.1.6.2\tools\Migrate.exe /conn "Data Source=.\SQLEXPRESS;Initial Catalog=paralib;Integrated Security=True" /provider SqlServer2012 /assembly bin\Debug\paralib-reference-migrations.dll /task rollback:all
-
-..\..\paralib-net-dependencies\packages\FluentMigrator.1.6.2\tools\Migrate.exe /conn "Data Source=.\SQLEXPRESS;Initial Catalog=paralib;Integrated Security=True" /provider SqlServer2012 /assembly bin\Debug\paralib-reference-migrations.dll /task migrate

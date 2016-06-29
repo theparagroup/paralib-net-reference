@@ -4,7 +4,6 @@ using com.paralib.Dal.Ef;
 
 namespace com.paralib.reference.models.Ef
 {
-    [DbConfigurationType(typeof(EfConfiguration))]
     public class DbContext:EfContext
     {
         public DbSet<EfCompany> Companies { get; set; }

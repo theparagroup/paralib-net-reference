@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using com.paralib;
+using com.paralib.Dal.Utils;
 using com.paralib.reference.models.Ef;
 
 namespace com.paralib.reference.console
@@ -27,6 +28,7 @@ namespace com.paralib.reference.console
 
         static void Go()
         {
+
             using (var db = new DbContext())
             {
                 var q = from e in db.Employees
