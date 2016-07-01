@@ -46,9 +46,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Company.cs" />
-    <Compile Include="Ef\DbContext.cs" />
     <Compile Include="Ef\EfCompany.cs" />
+    <Compile Include="Ef\EfContext.cs" />
     <Compile Include="Ef\EfEmployee.cs" />
+    <Compile Include="Ef\EfEmployeeType.cs" />
+    <Compile Include="Ef\EfExample.cs" />
     <Compile Include="Employee.cs" />
     <Compile Include="EmployeeType.cs" />
     <Compile Include="Example.cs" />

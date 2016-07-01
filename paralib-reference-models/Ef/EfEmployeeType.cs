@@ -4,7 +4,7 @@ using com.paralib.reference.models;
 
 namespace com.paralib.reference.models.Ef
 {
-	public class EfCompany:Company
+	public class EfEmployeeType:EmployeeType
 	{
 		public virtual List<Employee> Employees { get; set;}
 	}
