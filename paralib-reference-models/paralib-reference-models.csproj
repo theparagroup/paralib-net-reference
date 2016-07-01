@@ -50,9 +50,19 @@
     <Compile Include="Ef\EfEmployee.cs" />
     <Compile Include="Employee.cs" />
     <Compile Include="Company.cs" />
+    <Compile Include="EmployeeTypes.cs" />
     <Compile Include="Logic\Company.cs" />
     <Compile Include="Logic\Employee.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="test\companies.cs" />
+    <Compile Include="test\employees.cs" />
+    <Compile Include="test\example.cs" />
+    <Compile Include="test\Logic\companies.cs" />
+    <Compile Include="test\Logic\employees.cs" />
+    <Compile Include="test\Logic\example.cs" />
+    <Compile Include="test\Metadata\companies.cs" />
+    <Compile Include="test\Metadata\employees.cs" />
+    <Compile Include="test\Metadata\example.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\paralib-net\paralib-common\paralib-common.csproj">

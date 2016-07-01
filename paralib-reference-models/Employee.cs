@@ -20,6 +20,7 @@ namespace com.paralib.reference.models
 
         public int CompanyId { get; set; }
 
+        public EmployeeTypes EmployeeType { get; set; }
     }
 
 }

@@ -13,7 +13,7 @@ namespace com.paralib.reference.mvc.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            return View(new Employee());
+            return View(new Employee() { Id = 1 });
         }
 
         [Route("employee")]

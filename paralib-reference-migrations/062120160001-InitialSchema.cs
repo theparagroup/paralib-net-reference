@@ -31,7 +31,7 @@ namespace com.paralib.reference.migrations
             Create.Table("employees")
                 .WithColumn("id").AsParaType(ParaTypes.Key).PrimaryKey().Identity()
                 .WithColumn("name").AsParaType(ParaTypes.Name).NotNullable()
-                .WithColumn("email").AsParaType(ParaTypes.Email).NotNullable()
+                .WithColumn("email").AsParaType(ParaTypes.Email, "employee's corporate email address").NotNullable()
                 .WithColumn("company_id").AsParaType(ParaTypes.Key).NotNullable().ForeignKey("companies", "id");
 
 

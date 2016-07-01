@@ -36,7 +36,7 @@ namespace com.paralib.reference.migrations
                 .WithColumn("Float").AsFloat().WithDefaultValue(0)
                 .WithColumn("Guid").AsGuid().WithDefaultValue("newid()")
                 .WithColumn("Int16").AsInt16().WithDefaultValue(0)
-                .WithColumn("Int32").AsInt32().WithDefaultValue(0)
+                .WithColumn("Int32").AsInt32().WithDefaultValue(0).Nullable()
                 .WithColumn("Int64").AsInt64().WithDefaultValue(0)
                 .WithColumn("String").AsString(100).WithDefaultValue("")
                 .WithColumn("Time").AsTime().WithDefaultValue("getdate()");

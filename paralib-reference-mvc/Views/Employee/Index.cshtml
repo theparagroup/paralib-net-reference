@@ -1,49 +1,22 @@
-﻿@model com.paralib.reference.models.Employee
+﻿@using com.paralib.reference.models
+@model Employee
 
-<h2>Employee</h2>
 
 @{ 
 
-    using (var db = new com.paralib.reference.models.DbContext())
-    {
-        var q = from e in db.Employees
-                select e;
 
-        foreach (var e in q.ToList())
-        {
-            Response.Write(e.Email + " [" + e.Company.Name + "]<br />");
-        }
+    var companies = new List<Company>();
+
+    companies.Add (new Company() { Id = 1, Name = "FooCo" });
+    companies.Add(new Company() { Id = 2, Name = "BarCo" });
 
 
-        //foreach (var u in q)
-        //{
-        //    Response.Write(u);
-        //}
 
-        //var q = from u in db.Users
-        //        select u;
 
-        //var q = from u in db.Users
-        //        select new { Id= u.Id, Email = u.Email, Password=u.Password, UserTypeId = u.UserTypeId, UserType=u.UserType.Name };
-
-        //TODO binding in MVC and WEBAPI
-
-        //var q = from u in db.Users
-        //        select new TTB.Models.User() { Id = u.Id, Email = u.Email+u.UserType.Name, Password = u.Password, UserTypeId = u.UserTypeId};
-
-        ////string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList(), new Newtonsoft.Json.JsonSerializerSettings(){ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore});
-        //string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList());
-        //Response.Write(json);
-
-        //var l = q.ToList<TTB.Ef.efUser>();
-
-        //foreach (var u in l)
-        //{
-        //    Response.Write(u.Email+" ["+u.UserType.Name+"]<br />");
-        //}
-
-    }
 }
+
+
+<h2>Employee</h2>
 
     <hr />
 
@@ -55,19 +28,24 @@
 
         <hr />
 
-        @Html.LabelFor(m => Model.Id)
-        @Html.DisplayFor(m => Model.Id)
+        @Html.LabelFor(m => Model.Id)<span> : </span>
+        @Html.TextBoxFor(m => Model.Id)
         <br />
 
 
-        @Html.LabelFor(m => Model.Name)
+        @Html.LabelFor(m => Model.Name)<span> : </span>
         @Html.TextBoxFor(m => Model.Name)
         @Html.ValidationMessageFor(m => Model.Name)
         <br />
 
-        @Html.LabelFor(m => Model.Email)
+        @Html.LabelFor(m => Model.Email)<span> : </span>
         @Html.TextBoxFor(m => Model.Email)
         @Html.ValidationMessageFor(m => Model.Email)
+        <br />
+
+        @Html.LabelFor(m => Model.CompanyId)<span> : </span>
+        @Html.DropDownListFor(m => Model.CompanyId, new SelectList(companies,"Id","Name" ), "choose company")
+        @Html.ValidationMessageFor(m => Model.CompanyId)
         <br />
 
 
@@ -75,3 +53,49 @@
 
     }
 
+<hr />
+
+
+
+@{
+
+    //using (var db = new com.paralib.reference.models.DbContext())
+    //{
+    //    var q = from e in db.Employees
+    //            select e;
+
+    //    foreach (var e in q.ToList())
+    //    {
+    //        Response.Write(e.Email + " [" + e.Company.Name + "]<br />");
+    //    }
+
+
+    //foreach (var u in q)
+    //{
+    //    Response.Write(u);
+    //}
+
+    //var q = from u in db.Users
+    //        select u;
+
+    //var q = from u in db.Users
+    //        select new { Id= u.Id, Email = u.Email, Password=u.Password, UserTypeId = u.UserTypeId, UserType=u.UserType.Name };
+
+    //TODO binding in MVC and WEBAPI
+
+    //var q = from u in db.Users
+    //        select new TTB.Models.User() { Id = u.Id, Email = u.Email+u.UserType.Name, Password = u.Password, UserTypeId = u.UserTypeId};
+
+    ////string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList(), new Newtonsoft.Json.JsonSerializerSettings(){ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore});
+    //string json = Newtonsoft.Json.JsonConvert.SerializeObject(q.ToList());
+    //Response.Write(json);
+
+    //var l = q.ToList<TTB.Ef.efUser>();
+
+    //foreach (var u in l)
+    //{
+    //    Response.Write(u.Email+" ["+u.UserType.Name+"]<br />");
+    //}
+
+    //}
+}

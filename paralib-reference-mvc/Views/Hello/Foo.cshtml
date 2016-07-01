@@ -1,0 +1,47 @@
+﻿
+<h2>Employee</h2>
+
+@functions{ 
+        
+    public class Foo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+}
+
+@{ 
+    List<Foo> foos = new List<Foo>();
+
+    foos.Add(new Foo() { Id = 1, Name = "A" });
+    foos.Add(new Foo() { Id = 2, Name = "B" });
+    foos.Add(new Foo() { Id = 3, Name = "C" });
+
+    ViewData["foos"] = foos;
+
+    List<SelectListItem> items = new List<SelectListItem>();
+
+    items.Add(new SelectListItem() { Value = "1", Text = "Aaa" });
+    items.Add(new SelectListItem() { Value = "2", Text = "Bbb" });
+    items.Add(new SelectListItem() { Value = "3", Text = "Ccc" });
+
+    ViewData["items"] = items;
+
+
+
+
+
+}
+
+@Html.DropDownList("foo1",items,"pick something")<br/>
+
+@Html.DropDownList("foo2", new SelectList(foos, "Id", "Name"), "pick something")<br />
+
+
+@{ 
+    var selectList = from foo in foos select new SelectListItem() { Value=foo.Id.ToString(), Text=foo.Name, Selected=(foo.Id==2) };
+}
+
+@Html.DropDownList("foo3", selectList)<br />
+

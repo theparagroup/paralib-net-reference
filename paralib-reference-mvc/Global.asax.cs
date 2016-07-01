@@ -2,7 +2,6 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using com.paralib;
-using com.paralib.Configuration;
 
 namespace com.paralib.reference.mvc
 {

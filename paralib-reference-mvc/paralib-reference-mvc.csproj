@@ -102,6 +102,7 @@
     <Content Include="Views\Employee\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <None Include="paralib.config" />
+    <Content Include="Views\Hello\Foo.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

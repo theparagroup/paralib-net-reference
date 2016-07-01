@@ -13,7 +13,8 @@ namespace com.paralib.reference.mvc.Controllers
         public ActionResult Index()
         {
             _logger.Info("hello world");
-            return View(new Hello());
+            //return View(new Hello());
+            return View("Foo");
         }
       
 
