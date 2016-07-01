@@ -1,11 +1,10 @@
-﻿using System;
+using System;
+using System.Linq;
 
 namespace com.paralib.reference.models
 {
-    public partial class Company
-    {
+	public partial class Company
+	{
 
-    }
-
+	}
 }
-

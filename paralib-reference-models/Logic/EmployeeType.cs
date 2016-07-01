@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace com.paralib.reference.models
 {
-	public partial class example
+	public partial class EmployeeType
 	{
 
 	}

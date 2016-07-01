@@ -6,20 +6,20 @@ using com.paralib.reference.models.Models.Metadata;
 
 namespace com.paralib.reference.models.Models
 {
-	[MetadataType(typeof(exampleMetadata))]
-	public partial class example
+	[MetadataType(typeof(ExampleMetadata))]
+	public partial class Example
 	{
 	}
 }
 
 namespace com.paralib.reference.models.Models.Metadata
 {
-	public class exampleMetadata
+	public class ExampleMetadata
 	{
 
-		[Display(Name="id")]
-		[Required(ErrorMessage="id is required")]
-		public object id;
+		[Display(Name="Id")]
+		[Required(ErrorMessage="Id is required")]
+		public object Id;
 
 		[Display(Name="Ansi String")]
 		[Required(ErrorMessage="Ansi String is required")]
@@ -54,9 +54,9 @@ namespace com.paralib.reference.models.Models.Metadata
 		[Required(ErrorMessage="Date Time Offset is required")]
 		public object DateTimeOffset;
 
-		[Display(Name="Decimal_1_1")]
-		[Required(ErrorMessage="Decimal_1_1 is required")]
-		public object Decimal_1_1;
+		[Display(Name="Decimal11")]
+		[Required(ErrorMessage="Decimal11 is required")]
+		public object Decimal11;
 
 		[Display(Name="Decimal")]
 		[Required(ErrorMessage="Decimal is required")]

@@ -6,29 +6,29 @@ using com.paralib.reference.models.Models.Metadata;
 
 namespace com.paralib.reference.models.Models
 {
-	[MetadataType(typeof(companiesMetadata))]
-	public partial class companies
+	[MetadataType(typeof(CompanyMetadata))]
+	public partial class Company
 	{
 	}
 }
 
 namespace com.paralib.reference.models.Models.Metadata
 {
-	public class companiesMetadata
+	public class CompanyMetadata
 	{
 
-		[Display(Name="id")]
-		[Required(ErrorMessage="id is required")]
+		[Display(Name="Id")]
+		[Required(ErrorMessage="Id is required")]
 		[ParaType(ParaTypes.Key)]
-		public object id;
+		public object Id;
 
-		[Display(Name="name")]
-		[Required(ErrorMessage="name is required")]
+		[Display(Name="Name")]
+		[Required(ErrorMessage="Name is required")]
 		[ParaType(ParaTypes.Description)]
-		public object name;
+		public object Name;
 
-		[Display(Name="fooville")]
+		[Display(Name="Fooville")]
 		[ParaType(ParaTypes.City)]
-		public object fooville;
+		public object Fooville;
 	}
 }
