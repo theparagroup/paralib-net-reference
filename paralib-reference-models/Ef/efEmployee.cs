@@ -6,7 +6,7 @@ namespace com.paralib.reference.models.Ef
 {
 	public class EfEmployee:Employee
 	{
-		public virtual Company Company { get; set;}
-		public virtual EmployeeType EmployeeType { get; set;}
+		public virtual EfCompany Company { get; set;}
+		public virtual EfEmployeeType EmployeeType { get; set;}
 	}
 }

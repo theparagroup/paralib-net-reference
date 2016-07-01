@@ -6,6 +6,6 @@ namespace com.paralib.reference.models.Ef
 {
 	public class EfCompany:Company
 	{
-		public virtual List<Employee> Employees { get; set;}
+		public virtual List<EfEmployee> Employees { get; set;}
 	}
 }

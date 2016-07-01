@@ -32,11 +32,12 @@ namespace com.paralib.reference.console
             using (var db = new DbContext())
             {
                 var q = from e in db.Employees
+                        where e.EmployeeType.Name=="Regular" && e.Company.Name=="ACME"
                         select e;
 
                 foreach (var e in q.ToList())
                 {
-                    Console.WriteLine(e.Email + " [" + e.Company.Name + "]<br />");
+                    Console.WriteLine(e.Email +$" [{e.EmployeeType.Name}]"+ " [" + e.Company.Name + "]");
                 }
             }
 
