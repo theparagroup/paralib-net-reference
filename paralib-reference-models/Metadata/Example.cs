@@ -1,10 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using com.paralib.DataAnnotations;
-using com.paralib.reference.models.Models.Metadata;
+using com.paralib.reference.models.Metadata;
 
 
-namespace com.paralib.reference.models.Models
+namespace com.paralib.reference.models
 {
 	[MetadataType(typeof(ExampleMetadata))]
 	public partial class Example
@@ -12,11 +13,12 @@ namespace com.paralib.reference.models.Models
 	}
 }
 
-namespace com.paralib.reference.models.Models.Metadata
+namespace com.paralib.reference.models.Metadata
 {
 	public class ExampleMetadata
 	{
 
+		[Key, Column(Order = 0)]
 		[Display(Name="Id")]
 		[Required(ErrorMessage="Id is required")]
 		public object Id;
