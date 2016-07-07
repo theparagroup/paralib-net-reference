@@ -1,10 +1,78 @@
 ﻿@using com.paralib
 @using com.paralib.reference.mvc.Models
-@model Hello
 
 @{ 
+    //forcing this to initialize for pipeline event testing
     HttpContext.Current.Session["foo"] = 0;
 }
+
+<head>
+    <script src="~/Static/Libraries/jquery-2-1-4/jquery-2.1.4.js"></script>
+
+    <script>
+        $(function () {
+
+            $("#refresh").click(function () {
+                document.location.reload(true);
+            });
+
+
+            $("#unload").click(function () {
+                
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Content("~/unload")",
+                    cache: false,
+
+                    success: function (html) {
+                        document.location.reload(true)
+                    },
+
+                    error: function (html) {
+                        alert("error");
+                    }
+
+                });
+
+            });
+
+        });
+
+    </script>
+
+</head>
+
+<pre>
+NOW [@DateTime.Now.Ticks]<br />
+INI [@Paralib.InitializedAt] <br />
+</pre>
+
+<button id="unload">unload and refresh</button>
+<button id="refresh">refresh</button>
+
+<hr />
+
+System.Security.Principal.WindowsIdentity.GetCurrent().Name = @System.Security.Principal.WindowsIdentity.GetCurrent().Name <br />
+Request.LogonUserIdentity.Name = @Request.LogonUserIdentity.Name [ @Request.LogonUserIdentity.AuthenticationType ] <br />
+Request.IsAuthenticated = @Request.IsAuthenticated <br />
+System.Threading.Thread.CurrentPrincipal.Identity.Name = @System.Threading.Thread.CurrentPrincipal.Identity.Name [@System.Threading.Thread.CurrentPrincipal.GetType().Name] <br />
+Context.User.Identity.Name = @Context.User.Identity.Name [@Context.User.GetType().Name] <br />
+Context.User.Roles = 
+    @{
+        if (Context.User is com.paralib.Mvc.Authorization.ParaPrinciple)
+        {
+            foreach (string r in ((com.paralib.Mvc.Authorization.ParaPrinciple)Context.User).Roles)
+            {
+                    @(r) <text>,</text>
+            }
+
+        }
+    }
+
+    <br />
+
+
+<hr />
 
 CurrentConfigPath=@(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) <br />
 DotNetConfigPath=@(com.paralib.Configuration.ConfigurationManager.DotNetConfigPath) <br />
@@ -76,11 +144,6 @@ Connection Strings:
 
 <hr />
 
-    <div style="border-style: solid; border-width: 1px;">
-        @Model.Message
-    </div>
-
-<hr />
 
 @foreach (var m in HttpContext.Current.ApplicationInstance.Modules.AllKeys)
 {
@@ -91,14 +154,6 @@ Connection Strings:
 <hr />
 
 
-System.Security.Principal.WindowsIdentity.GetCurrent().Name = @System.Security.Principal.WindowsIdentity.GetCurrent().Name <br />
-Request.LogonUserIdentity.Name = @Request.LogonUserIdentity.Name [ @Request.LogonUserIdentity.AuthenticationType ] <br />
-Request.IsAuthenticated = @Request.IsAuthenticated <br />
-System.Threading.Thread.CurrentPrincipal.Identity.Name = @System.Threading.Thread.CurrentPrincipal.Identity.Name [@System.Threading.Thread.CurrentPrincipal.GetType().Name] <br />
-Context.User.Identity.Name = @Context.User.Identity.Name [@Context.User.GetType().Name] <br />
-
-
-<hr />
 
 @{
 

@@ -20,7 +20,7 @@
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
-    <IISExpressUseClassicPipelineMode>true</IISExpressUseClassicPipelineMode>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -92,8 +92,17 @@
   <ItemGroup>
     <Content Include="asp-deepdive.txt" />
     <Content Include="Global.asax" />
+    <Content Include="Areas\Admin\Views\web.config" />
+    <Content Include="Areas\Admin\Views\Login\Login.cshtml" />
+    <Content Include="Areas\Admin\Views\Login\Test.cshtml" />
+    <None Include="Static\Libraries\jquery-2-1-4\jquery-2.1.4.intellisense.js" />
+    <Content Include="Static\Libraries\jquery-2-1-4\jquery-2.1.4.js" />
+    <Content Include="Static\Libraries\jquery-2-1-4\jquery-2.1.4.min.js" />
+    <Content Include="Static\Libraries\jquery-validate\jquery.validate-1.8.0.1.js" />
+    <Content Include="Static\Libraries\ms-unobstrusive\jquery.unobtrusive-ajax-3.2.3.js" />
+    <Content Include="Static\Libraries\ms-unobstrusive\jquery.validate.unobtrusive-3.2.3.js" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Hello\Index.cshtml" />
+    <Content Include="Views\Info\Index.cshtml" />
     <Content Include="Views\Main.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="packages.config">
@@ -102,7 +111,7 @@
     <Content Include="Views\Employee\Index.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <None Include="paralib.config" />
-    <Content Include="Views\Hello\Foo.cshtml" />
+    <Content Include="Static\Libraries\jquery-2-1-4\jquery-2.1.4.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -117,8 +126,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Areas\Admin\AdminView.cs" />
+    <Compile Include="Areas\Admin\AdminController.cs" />
+    <Compile Include="Areas\Admin\Controllers\LoginController.cs" />
+    <Compile Include="Areas\Admin\Models\Credentials.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
-    <Compile Include="Controllers\HelloController.cs" />
+    <Compile Include="Controllers\InfoController.cs" />
+    <Compile Include="Controllers\AuthenticationController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -143,7 +157,9 @@
       <Name>paralib-reference-models</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Views\Shared\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

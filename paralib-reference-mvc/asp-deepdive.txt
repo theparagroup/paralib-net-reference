@@ -848,6 +848,10 @@ it does nothing. It fires its own FormsAuthenticate event and if a handler creat
 will become the principal. Otherwise it will look for an ecrypted "ticket" (FormsAuthenticationTicket)
 inside an "auth cookie", if there is no ticket (or if the ticket has expired), it does nothing.
 
+		<authentication mode="Forms">
+		   <forms loginUrl="~/login" defaultUrl="~/foobar"/>
+		</authentication>   
+
 If there is a ticket, then it "renews" the ticket and creates a GenericPrinciple with a FormsIdentity
 using the information in the ticket, and saves the encrypted ticket back into the cookie.
 
@@ -877,6 +881,11 @@ is set, nothing. Otherwize, the IPrincipal is checked against the access rules i
 and if the user doesn't have access, the statas is set to 401 (unauthorized) and the pipeline jumps
 to the EndRequest event (no handler is served).
 
+		<authorization>
+		   <deny users ="?" />
+		   <allow users = "*" />
+		</authorization>
+
 The Windows and Default modules don't handle EndRequest, but Forms does. If not a 401, then nothing.
 If the Response.SuppressFormsAuthenticationRedirect is set, nothing. Otherwise, send a 302 redirect
 to the login page in the config file. When doing the redirect, we save the "ReturnUrl" so that the login
@@ -894,6 +903,7 @@ If the user has the proper credentials, the login page should:
 		encrypt it
 		create a cookie using the cookie name in the config file and the encrypted ticket
 		redirect the user to the originally requested page (ReturnUrl)
+		or redirect to the defaultUrl, if no return url 
 
 Note: there are helper methods in the FormsAuthentication class to do most of this, but these
 steps can be done in user code as well.
@@ -1343,7 +1353,13 @@ IClientValidatable
 ====	Forms Authentication & MVC
 =============================================================
 
-When using MVC (and ASP.NET routes), we don't use the UrlAuthorizationModule.
+When using MVC (and ASP.NET routes), we don't use the UrlAuthorizationModule, so make sure
+you don't have anything like this in webconfig:
+
+		<authorization>
+		   <deny users ="?" />
+		   <allow users = "*" />
+		</authorization>
 
 Instead, we use the MVC [Authorize] attribute, which is an "authorization filter" that sends
 back a 401 if the user is not authorized.
@@ -1351,6 +1367,8 @@ back a 401 if the user is not authorized.
 Before MVC3, it was difficult to secure all of your controllers. The solution was usually
 to create a base controller with the attribute applied. In MVC3 global action filters were
 introduced.
+
+		GlobalFilters.Filters.Add(new AuthorizeAttribute());
 
 In MVC4, the [AllowAnonymous] was introduced, which works with the [Authorize] attribute
 to allow anonymous access to login actions.

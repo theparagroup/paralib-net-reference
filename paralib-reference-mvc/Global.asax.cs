@@ -41,10 +41,8 @@ namespace com.paralib.reference.mvc
 
         protected void Application_OnStart(object sender, EventArgs e)
         {
-            RouteTable.Routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-            RouteTable.Routes.MapMvcAttributeRoutes();
-
             _logger.Info(null);
+
         }
 
 
@@ -77,6 +75,7 @@ namespace com.paralib.reference.mvc
 
         protected void Application_Error(object sender, EventArgs e)
         {
+            //TODO move to httpmodule
             Exception ex = Server.GetLastError();
             _logger.Fatal(ex.Message);
         }
