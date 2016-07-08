@@ -1444,3 +1444,84 @@ MVC3 introduces “Unobtrusive Client Validation” - uses jquery validate inste
 jquery
 jquery-val
 ms unobtrusive
+
+
+=============================================================
+====	WebApi2
+=============================================================
+
+differences 1 & 2
+
+differnent namespace from MVC
+
+config
+		using WebApi=System.Web.Http;
+		using static System.Web.Http.HttpConfigurationExtensions;
+		WebApi.GlobalConfiguration.Configure(config => config.MapHttpAttributeRoutes(new InheritRoutingAttributesDirectRouteProvider()));
+
+global filters:
+
+			config.Filters.Add(new CustomAuthenticationAttribute());
+
+references:
+		System.Web.Http.dll
+		System.Web.Http.WebHost.dll  (GlobalConfiguration is in here)
+		System.Net.Http.Formatting.dll
+
+Json.Net issue
+		System.Net.Http.Formatting.dll binds to a specific version of Newtonsoft's Json library
+		fix:
+
+			<runtime>
+				<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+					<dependentAssembly>
+						<assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed"/>
+						<bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="8.0.0.0"/>
+					</dependentAssembly>
+				</assemblyBinding>
+			</runtime>
+
+
+
+no area support
+
+RoutePrefix
+Route
+
+
+DefaultDirectRouteProvider (change inheritence rules of attributes)
+
+accept
+content-type
+
+application/xml
+application/json
+
+formatters vs. HttpResponseMessage vs. IHttpActionResult
+
+
+GET /things
+GET /things/5
+GET /things/5/details
+POST /things (create new)
+PUT /things/5 (save)
+DELETE /things/5 
+
+model binding
+
+[FromBody]
+
+basic authentication (RFC 2617)
+		[Authorize] attribute
+		WWW-Authenticate header from server
+		Authorization header from client
+			“name:password”, base64-encoded
+			valid in the context of a "realm," defined by the server
+
+Google Chrome:
+	Postman (google app)
+
+Firefox, change default accepts:
+
+	about:config
+	network.http.accepts.default
