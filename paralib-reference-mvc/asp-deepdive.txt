@@ -145,6 +145,32 @@ explorer and hit F4 (these are in the *.csproj):
 		SSL Enabled
 		PipeLine Mode (Integrated, Classic)
 		etc.
+
+Installing IIS:
+
+		Programs and Features
+		Turn Windows Features On or Off
+			IIS/WWW Services/Application Development Features/ASP.NET
+			IIS/Common HTTP Features/Static Content
+			IIS/Common HTTP Features/Directory Browsing
+			IIS/Common HTTP Features/HTTP Redirect
+			IIS/Common HTTP Features/HTTP Errors
+			IIS/Web Management Tools/IIS Management Console
+
+		If you don't see any 4.0 Application pools, run this as admin:
+
+			C:\Windows\Microsoft.NET\Framework64\aspnet_regiis.exe -i 
+
+		Give the "iis apppool\defaultapppool" user full access to your web directory
+		Set your application's app pool to ASP.NET 4.0
+
+Creating an Application:
+		
+		Start IIS Manager
+		Go to sites, make sure port is free and site is running (bindings)
+		Add Application
+
+		If you need to run 32 .NET, application pool > Advanced Settings > Set “Enable 32-Bit Applications” = True
 		
 To use IIS with Visual Studio, ensure you have access to the following folder:
 
