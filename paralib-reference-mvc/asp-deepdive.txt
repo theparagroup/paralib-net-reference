@@ -164,6 +164,8 @@ Installing IIS:
 		Give the "iis apppool\defaultapppool" user full access to your web directory
 		Set your application's app pool to ASP.NET 4.0
 
+		Open the port in your firewall.
+
 Creating an Application:
 		
 		Start IIS Manager
