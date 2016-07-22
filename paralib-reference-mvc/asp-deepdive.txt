@@ -166,6 +166,8 @@ Installing IIS:
 
 		Open the port in your firewall.
 
+		Remove WebDAV module and handler if you are getting 405s.
+
 Creating an Application:
 		
 		Start IIS Manager
