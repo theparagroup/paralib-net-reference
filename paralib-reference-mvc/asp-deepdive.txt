@@ -161,12 +161,14 @@ Installing IIS:
 
 			C:\Windows\Microsoft.NET\Framework64\aspnet_regiis.exe -i 
 
-		Give the "iis apppool\defaultapppool" user full access to your web directory
+		Give the "iis apppool\defaultapppool" user full access to your web directory.
+
 		Set your application's app pool to ASP.NET 4.0
 
 		Open the port in your firewall.
 
-		Remove WebDAV module and handler if you are getting 405s.
+		Remove WebDAV module and handler if you are getting 405s when using other
+		verbs such as PUT.
 
 Creating an Application:
 		
