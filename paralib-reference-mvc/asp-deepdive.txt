@@ -1079,7 +1079,13 @@ upon the first request.
 
 In MVC, you can force views to be compiled at build by adding this to the *.csproj:
 
-		<MvcBuildViews>true</MvcBuildViews>
+		<PropertyGroup>
+			<MvcBuildViews>true</MvcBuildViews>
+		</PropertyGroup>
+
+		<Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+			<AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+		</Target>
 
 But that doesn't actually pre-compile the views and they will still be compiled at
 runtime. To do that, see the following NuGet packages:
