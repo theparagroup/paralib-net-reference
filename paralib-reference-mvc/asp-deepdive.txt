@@ -208,6 +208,14 @@ Remove it like this if you want:
 			</compilation>
 		</system.web>
 
+Viewing Errors:
+
+		<system.web>
+			<customErrors mode="Off" />
+
+		<system.webServer>
+			<httpErrors errorMode="Detailed" />
+
 =============================================================
 ====	IIS Architecture and IIS Authentication
 =============================================================
@@ -1563,3 +1571,11 @@ Firefox, change default accepts:
 
 	about:config
 	network.http.accepts.default
+
+
+WebAPI 2 errors
+	<system.webServer>
+		<httpErrors errorMode="Detailed" />
+
+
+
