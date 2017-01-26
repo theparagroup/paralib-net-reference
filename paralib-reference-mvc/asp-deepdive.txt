@@ -190,6 +190,11 @@ To use IIS with Visual Studio, ensure you have access to the following folder:
 				Port
 				Verify Web Site is running
 
+Note: you may need to install the "IIS Metabase and IIS 6 configuration compatibility" windows feature
+
+Note: you will probably need to run VS as administrator in order to debug IIS
+				
+				
 Note: Visual Studio installs the "PageInspector" assembly in your machine's 
 web.config here:
 
