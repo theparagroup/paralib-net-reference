@@ -1379,6 +1379,13 @@ And add the following to your web.config:
 		</system.codedom>
 
 
+If using Visual Studio 2015 (no updates), there is a bug that causes excessive CPU usage.
+Add this to turn off shared compilation:
+
+		<PropertyGroup>
+			<UseSharedCompilation>false</UseSharedCompilation>
+		</PropertyGroup>
+
 =============================================================
 ====	Validation
 =============================================================
