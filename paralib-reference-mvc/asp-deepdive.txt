@@ -146,6 +146,19 @@ explorer and hit F4 (these are in the *.csproj):
 		PipeLine Mode (Integrated, Classic)
 		etc.
 
+Note: Visual Studio apparently expects IIS Express to have at least one site
+configured at the root, or IIS will fail to start. This works:
+
+			<site name="root" id="1" serverAutoStart="true">
+                <application path="/">
+                    <virtualDirectory path="/" physicalPath="%IIS_SITES_HOME%\" />
+                </application>
+                <bindings>
+                    <binding protocol="http" bindingInformation=":8080:localhost" />
+                </bindings>
+            </site>
+
+
 Installing IIS:
 
 		Programs and Features
