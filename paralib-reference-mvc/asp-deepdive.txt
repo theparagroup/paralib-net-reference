@@ -1050,7 +1050,7 @@ state of change, and still pretty heavy.
 
 
 =============================================================
-====	ASP.NET Web Forms vs Web Pages (and Razor)
+====	ASP.NET Web Forms vs Web Pages (and Razor) vs MVC
 =============================================================
 
 TODO
@@ -1059,11 +1059,18 @@ TODO
 
  rework
 
- WebPagesDeployment & version
+ WebPages Deployment & Version
+
+ You can use web pages (*.cshtml) without MVC by enabling the web page engine:
 
 	   <appSettings>
-		<add key="webpages:Enabled" value="false" />
-	  </appSettings>
+			<add key="webpages:Version" value="3.0.0.0"/>
+			<add key="webpages:Enabled" value="false"/>
+	   </appSettings>
+
+Your web page should inherit from :
+
+		@inherits System.Web.WebPages.WebPage
 
 "*.cshtml" -> HttpForbiddenHandler & routehandler +remap
 
@@ -1230,7 +1237,22 @@ Create new project:
 
 Add Microsoft.AspNet.Mvc 5 via NuGet (or do it manually - see below)
 
-Create a global event handler (Global.asax)
+The basic "Web.config" file works fine because everything will be configured
+automatically (see "zero configuration"). However, you may want to enable/disable
+the basic (non-MVC) WebPages framework, and specifiy a version:
+		
+		<configuration>
+			<appSettings>
+				...
+				<add key="webpages:Version" value="3.0.0.0"/>
+				<add key="webpages:Enabled" value="false"/>
+			</appSettings>
+
+You may also want to remove the PageInspector assembly, see the IIS configuration
+section for more.
+
+Create a global event handler (Global.asax), using the "Global Application Class"
+template.
 
 IIS usually has several HttpHandlers installed to process "resources", such as
 scripts and other data embedded into assemblies. These handlers are registered
@@ -1253,10 +1275,33 @@ MVC applications will have the following instruction in Application_Start:
 
 Create a controller. The containing folder name doesn't matter, but the class
 should derive from Controller and the class name must end in "Controller".
-We use attribute-based routing.
+We use attribute-based routing:
+
+		using System.Web.Mvc;
+
+		namespace MvcTheHardWay
+		{
+			public class HelloController: Controller
+			{
+				[Route("~/hello")]
+				public ActionResult Index()
+				{
+					return View();
+				}
+			}
+		}
 
 Configure attribute-based routing in the application start event. We don't 
-use the older MapRoute-based configuration in our projects.
+use the older MapRoute-based configuration in our projects. Add the following 
+to Application_Start as well:
+
+		RouteTable.Routes.MapMvcAttributeRoutes();
+
+You'll want to add the following using declarations to resolve the classes and
+extension methods:
+
+		using System.Web.Mvc;
+		using System.Web.Routing;
 
 Create a "Views" folder (following the ViewEngine conventions), and add a Web.config 
 file to configure razor and prevent *.cshtml and other files from being served or
@@ -1264,7 +1309,22 @@ executed when accessed directly (remember that when a file path exists, it isn't
 In other words, stuff in the views folder should only be accessible via routes and the 
 view engine, not http://localhost/Views.
 
-Add a view. Visual Studio 2015 will only help you create Razor views these days, but 
+You can find a template (with further explanations) for the "Views/Web.config" file here:
+
+		..\paralib-net-dependencies\templates\mvc5\Views\Web.config
+
+Make sure to change the namespace value here:
+
+        <!-- our application namespace -->
+        <add namespace="MvcTheHardWay" />
+
+Create a folder under Views with the name of the controller, or create a "Shared" folder,
+and add a view (optionally using the various Visual Studio wizards):
+
+		/Views/Hello/Index.cshtml
+		/Views/Shared/Index.cshtml
+
+Visual Studio 2015 will only help you create Razor views these days, but 
 if you want to create an *.aspx, create it manually and just make sure you change the 
 base class to ViewPage:
 
@@ -1278,9 +1338,8 @@ base class to ViewPage:
 Add a model, pass it to the view in the controller. Optionally mark the view as 
 strongly-typed. You can do this with *.aspx files as well, just use ViewPage<T>.
 
-Use a layout.
+From here, you can try using a layout, or a _ViewStart file, etc etc.
 
-Move the layout code to a _ViewStart file (note case of the word viewstart doesn't matter).
 
 Done.
 
@@ -1288,6 +1347,8 @@ Done.
 =============================================================
 ====	Manual Installation of MVC 5 (with Razor & Roslyn)
 =============================================================
+
+Also see "Creating an MVC5 Project" (above).
 
 The MVC NuGet packages aren't magic, and it helps to understand how to create an MVC project
 without using NuGet at all.
@@ -1357,7 +1418,19 @@ Roslyn:
 		@($"this is foo: {foo}")
 
 Unfortunately, this is pretty complicated to do manually, so you'll still want to use NuGet for
-this. But we'll explain what the NuGet package actually does:
+this. Using a "nuget.config" file, we can use the package repository in the "paralib-net-dependencies"
+git repo. You can just add the following to the packages.config:
+
+	<packages>
+		...
+		<package id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="1.0.1" targetFramework="net46" />
+		<package id="Microsoft.Net.Compilers" version="1.0.0" targetFramework="net46" developmentDependency="true" />
+	</packages>
+
+
+
+
+But we'll still explain what the NuGet package actually does:
 
 Install the NuGet package  "CodeDOM Providers for .NET Compiler" v1.0.1, which will add the
 following reference to your project:
@@ -1393,11 +1466,15 @@ And add the following to your web.config:
 
 
 If using Visual Studio 2015 (no updates), there is a bug that causes excessive CPU usage.
-Add this to turn off shared compilation:
+Add this to the project file to turn off shared compilation:
 
 		<PropertyGroup>
 			<UseSharedCompilation>false</UseSharedCompilation>
 		</PropertyGroup>
+
+
+
+
 
 =============================================================
 ====	MVC Routing
@@ -1615,4 +1692,10 @@ WebAPI 2 errors
 		<httpErrors errorMode="Detailed" />
 
 
+=============================================================
+====	Paralib Patterns for MVC
+=============================================================
 
+inheritance patterns for models, views, controllers, areas, webapi2, asmx
+
+todo
