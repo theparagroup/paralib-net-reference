@@ -1722,6 +1722,9 @@ Azure tools sticks a copy of the old one here, which is registered as a global l
 
 	C:\Program Files\Microsoft SDKs\Azure\.NET SDK\v2.9\bin\plugins\Diagnostics
 
+
+https://connect.microsoft.com/VisualStudio/feedback/details/850425/windows-azure-vs-tools-breaking-msbuild-for-web-projects
+
 Fix:
 
 Remove the Newtonsoft DLL from here.
