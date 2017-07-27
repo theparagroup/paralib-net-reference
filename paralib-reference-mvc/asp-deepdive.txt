@@ -1628,18 +1628,6 @@ references:
 		System.Web.Http.WebHost.dll  (GlobalConfiguration is in here)
 		System.Net.Http.Formatting.dll
 
-Json.Net issue
-		System.Net.Http.Formatting.dll binds to a specific version of Newtonsoft's Json library
-		fix:
-
-			<runtime>
-				<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-					<dependentAssembly>
-						<assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed"/>
-						<bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="8.0.0.0"/>
-					</dependentAssembly>
-				</assemblyBinding>
-			</runtime>
 
 
 
@@ -1699,3 +1687,41 @@ WebAPI 2 errors
 inheritance patterns for models, views, controllers, areas, webapi2, asmx
 
 todo
+
+
+
+=============================================================
+====	Json.Net Binding Issue
+=============================================================
+
+Several built-in assemblies bind to a specific version of Newtonsoft's Json library (6.0)
+
+	System.Net.Http.Formatting.dll
+	System.Web.Http.dll
+
+
+Visual Studio will give you warnings, but things should work.
+
+Fix:
+
+	<runtime>
+		<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			<dependentAssembly>
+				<assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed"/>
+				<bindingRedirect oldVersion="0.0.0.0-6.0.0.0" newVersion="8.0.0.0"/>
+			</dependentAssembly>
+		</assemblyBinding>
+	</runtime>
+
+=============================================================
+====	Json.Net Azure Issue
+=============================================================
+
+
+Azure tools sticks a copy of the old one here, which is registered as a global location (so VS clobbers your version)
+
+	C:\Program Files\Microsoft SDKs\Azure\.NET SDK\v2.9\bin\plugins\Diagnostics
+
+Fix:
+
+Remove the Newtonsoft DLL from here.
